@@ -5,8 +5,11 @@ from config import config
 from logger import logger
 import os
 import time
+from dotenv import load_dotenv
+import pandas as pd
+load_dotenv()
 
-# df = pd.read_csv("TSMIP_Dataset/GDMScatalog_test.csv")
+# df = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
 # date = df["date"].values
 # time = df["time"].values
 # combined_list = [f"{d}T{t}" for d, t in zip(date, time)]
@@ -65,24 +68,20 @@ class GDMS:
             "username": os.getenv("GDMS_ACCOUNT"),
             "password": os.getenv("GDMS_PASSWORD")
         }
-        rs = requests.session()
-
         try:
-            response = rs.post(login_url, data=login_data) #login logic: After login it will set up the session id in this machine, and it could login through this info
-            logger.info("Logged in to GDMS")
-
-            get_catalog_url = f"{self.api_url}/dbconnect/getCatalog.php"
-            catalog_range = config.get("catalog_range")
-            eq_data = rs.post(get_catalog_url, data=catalog_range)
-            logger.info("Get waveform success, please check infomation in GDMS website")
-            logger.info(eq_data.text)
+            self.rs = requests.session()
+            response = self.rs.post(login_url, data=login_data) #login logic: After login it will set up the session id in this machine, and it could login through this info
+            if response.status_code == 200:
+                logger.info("Logged in to GDMS")
+            elif response.status_code != 200:
+                logger.error("Login failed, please check login information")
 
         except:
-            logger.error("Login failed, please check login information")
+            logger.error("Login failed, please check base setting")
     
     def getWaveform(self):
         """
-            Log in to the GDMS API and set the authorization token in the request headers.
+            Get special condition date waveform through api
 
             Returns:
                 None
@@ -91,9 +90,14 @@ class GDMS:
         eq_condition = config.get("eq_condition")
         try:
             eq_data = self.rs.post(get_waveform_url, data=eq_condition)
-            logger.info("Get waveform success, please check infomation in GDMS website")
+            if eq_data.json()["status"] == 1:
+                logger.info("Get waveform success, please check infomation in GDMS website")
+            else:
+                logger.error("Get waveform fail, please check get waveform information")
+
+            return eq_data
         except:
-            logger.error("Get waveform fail")
+            logger.error("Get waveform fail, please check base setting")
     
     def getCatalog(self):
         get_catalog_url = f"{self.api_url}/dbconnect/getCatalog.php"
@@ -101,11 +105,19 @@ class GDMS:
 
         try:
             eq_data = self.rs.post(get_catalog_url, data=catalog_range)
-            logger.info("Get waveform success, please check infomation in GDMS website")
+            eq_data.json()
+            logger.info("Get catalog success, please check infomation in GDMS website")
 
             return eq_data
         except:
             logger.error("Get waveform fail")
+    
+    def jsonToCsv(self, json_string, csv_output_name):
+        df = pd.read_json(json_string)
+        df.to_csv(f'{csv_output_name}.csv')
+
 
 if __name__=='__main__':
     gdms = GDMS()
+    eq_data=gdms.getCatalog()
+    print(eq_data)

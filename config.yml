@@ -12,8 +12,8 @@ eq_condition: {
     "location": "all",
     "dt1": -120,
     "dt2": 480,
-    "timelist": combined_string,
-    "label": "Test_request"
+    "timelist": '2023-07-31T04:38:56',
+    "label": "Test_function"
 }
 
 catalog_range: {
