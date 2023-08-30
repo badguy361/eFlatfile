@@ -1,0 +1,32 @@
+# api_url for GDMS
+api_url: https://gdmsn.cwb.gov.tw/php
+
+# log_level ERROR > WARNING > INFO > DEBUG
+log_level: DEBUG
+
+eq_condition: {
+    "output": 'multi-mseed',
+    "network": 'TSMIP',
+    "station": 'all',
+    'channel': "HL?",
+    "location": "all",
+    "dt1": -120,
+    "dt2": 480,
+    "timelist": combined_string,
+    "label": "Test_request"
+}
+
+catalog_range: {
+    "stdate": '2023-01-01',
+    "eddate": '2023-08-30',
+    "stML": '0',
+    "edML": '10',
+    "sttime": '00:00:00',
+    "edtime": '00:00:00',
+    "stdep": '0',
+    "eddep": '1000',
+    "stlon": '118',
+    "edlon": '126',
+    "stlat": '20',
+    "edlat": '26'
+}
