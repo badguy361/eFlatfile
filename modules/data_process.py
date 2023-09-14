@@ -4,11 +4,23 @@ import pandas as pd
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 import numpy as np
+from datetime import datetime
+import re
 
-class AutoPickModel():
+class dataProcess():
     def __init__(self):
         pass
-
+    
+    def reName(self, file_name):
+        timestamp = file_name.split('.')[-4:-1] # date part
+        year, day_of_year, time = timestamp
+        time = time.zfill(6)
+        formatted_timestamp = datetime.strptime(f"{year}{day_of_year}{time}", "%Y%j%H%M%S")
+        converted_timestamp = formatted_timestamp.strftime('%Y%m%d%H%M%S')
+        pattern = r'\d{4}\.\d{3}\.\d+'
+        new_file_name = re.sub(pattern, converted_timestamp, file_name)
+        return new_file_name
+    
     def getArrivalTime(self, catlog ,model_name='iasp91'):
         iasp91_P_arrival = []
         iasp91_S_arrival = []
@@ -35,5 +47,6 @@ class AutoPickModel():
 
 
 if __name__ == '__main__':
-    catlog = pd.read_csv("D:/緬甸BH/merge_event_eq(add_cut_2021).csv")
+    data = dataProcess()
+    new_file_name = data.reName('TW.A002.10.HLE.D.2022.260.213900.SAC')
     

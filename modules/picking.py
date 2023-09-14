@@ -11,22 +11,27 @@ from sac2asc import sac2asc
 from obspy.io.sac import SACTrace
 
 class picking():
-    def __init__(self, sac_path, asc_year_path, asc_path):
+    def __init__(self, sac_path, asc_path):
+        os.putenv("SAC_DISPLAY_COPYRIGHT","0")
         self.sac_path = sac_path
-        self.asc_year_path = asc_year_path
         self.asc_path = asc_path
-        if not os.path.isdir(self.asc_year_path):
-            os.mkdir(self.asc_year_path)
-        if not os.path.isdir(self.asc_path):
-            os.mkdir(self.asc_path)
 
     def sortFile(self, catlog): #TODO
         pass
         # return int(file.split("_")[3]),file.split("_")[1][0]
     def openFile(self, year ,mon ,num):
-        self.year = year
-        self.mon = mon
-        self.num = num
+        files = glob.glob(f"{self.sac_path}/*HLE*.SAC")
+        print(files)
+        file_names = [os.path.basename(file) for file in files]
+        HLE = file_names[0]
+        s = f"r {self.sac_path}/{HLE} \n"
+        # 畫圖 ＆ 顯示資訊 + pick mode
+        s += "qdp of \n"
+        s += "ppk m \n"
+        s += "w over \n"
+        s += "q \n"
+        subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(s.encode()) # show the interactivate window
+
     def checkResult(self, result, read_file_name, check):
         index =  self.num
         if check=="Y" or check=="y": 
@@ -87,17 +92,8 @@ if __name__=='__main__':
     year = "2021" 
     mon = "05"
     num = 1
-    sac_path = f"/home/joey/緬甸/dataset/MM_events_20160101-20211026/{year}/{mon}/"
-    asc_year_path = f"/home/joey/緬甸/output/{year}"
-    asc_path = f"/home/joey/緬甸/output/{year}/{mon}/"
+    sac_path = f"../TSMIP_Dataset/GuanshanChishangeq"
+    asc_path = f"../TSMIP_Dataset/picking_result"
 
-
-    # 讀入event catalog
-    catlog = pd.read_csv("/home/joey/緬甸/merge_event_eq(add_cut_2021).csv")
-
-    # 改變當前路徑
-    os.chdir(f"{sac_path}")
-
-    # 讀入所有HNE的資料,主要是獲得檔名
-    file_name = glob.glob("*HNE*.sac")
-    # file_name.sort(key=sortFile)
+    pick = picking(sac_path, asc_path)
+    _ = pick.openFile(year ,mon ,num)
