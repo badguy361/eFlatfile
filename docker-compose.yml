@@ -13,6 +13,10 @@ services:
     build: ./
     ports:
       - "8000:8000"
+    environment:
+      - DISPLAY=140.115.78.186:0.0
+    volumes:
+      - ./TSMIP_Dataset:/app/TSMIP_Dataset
     depends_on:
       - mariadb
   phpmyadmin:

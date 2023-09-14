@@ -2,6 +2,7 @@
 *.mseed
 *.tgz
 *.gz
+*.SAC
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
