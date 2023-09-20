@@ -22,7 +22,7 @@ class picking(dataProcess):
         self.sac_path = sac_path
         self.asc_path = asc_path
         self.result = {}
-
+        self.zory = ''
 
     def readFile(self, year, mon):
         total_files = glob.glob(f"{self.sac_path}/*HLE*.SAC")
@@ -38,7 +38,6 @@ class picking(dataProcess):
             s = f"r {self.sac_path}/{HLZ} \
                 {self.sac_path}/{HLE} \
                 {self.sac_path}/{HLN} \n"
-
             # 畫圖 ＆ 顯示資訊 + pick mode
             s += "qdp of \n"
             s += "ppk m \n"
@@ -47,28 +46,28 @@ class picking(dataProcess):
             subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
                 s.encode())  # show the interactivate window
 
-            sac1 = SACTrace.read(f"{HLE}")
-            sac2 = SACTrace.read(f"{HLN}")
-            sacZ = SACTrace.read(f"{HLZ}")
+            sac1 = SACTrace.read(f"{self.sac_path}/{HLE}")
+            sac2 = SACTrace.read(f"{self.sac_path}/{HLN}")
+            sacZ = SACTrace.read(f"{self.sac_path}/{HLZ}")
             # print(type(sac1.data[1]))
             # print(sac1.reftime)
 
-    def inputResult(self, file_name, sac1, sac2 , sacZ):
+            self.inputResult(file_name)
+            if self.zory != '':
+                self.sacToAsc(file_name, sac1, sac2 , sacZ, self.zory)
+
+    def inputResult(self, file_name):
         print("Accept [Y/y] or Accpet but Z [Z/z] or Reject [Others]?")
         check = input()
         if check == "Y" or check == "y":
             print(f"Result : {check}")
             # 存取資訊
             self.result[num] = [file_name, "y"]
-            # 讀檔（要丟到sac2asc中）
-            zory = "y"
-
+            self.zory = "y"
         elif check == "Z" or check == "z":
             print(f"Result : {check}")
             self.result[num] = [file_name, "z"]
-            zory = "z"
-
-        # 當判定1-5也要存取輸出檔
+            self.zory = "z"
         elif check == "1":
             print(f"Result : 1")
             self.result[num] = [file_name, "1"]
@@ -87,15 +86,20 @@ class picking(dataProcess):
         else:
             print("NO DEFINE!!!")
             self.result[num] = [file_name, "NO DEFINE"]
-    
-    def sacToAsc():
-        # 改變當前路徑
-        os.chdir(f"{asc_path}")
-        # 轉出asc檔案
-        data = sac2asc(sacZ, sac1, sac2, zory)
-        data.__call__()
-        os.rename(f'{asc_path}data.asc', f'{asc_path}{read_file_name}.asc')
 
+    def sacToAsc(self, file_name, sac1, sac2 , sacZ, zory):
+        data = sac2asc(sacZ, sac1, sac2, zory)
+        data.__call__(asc_path)
+        os.rename(f'{asc_path}/data.asc', f'{asc_path}/{file_name}.asc')
+
+    def getDist(self):
+        pass
+    
+    def getMw(self):
+        pass
+
+    def getArrivalTime(self):
+        pass
 if __name__ == '__main__':
     year = "2021"
     mon = "05"

@@ -31,8 +31,8 @@ class sac2asc:
         for i in range(self.npts1):
             self.y2[i]=self.y2[i]-self.m2 # normalize
             
-    def __call__(self):
-        with open("data.asc","w") as file: # !namex
+    def __call__(self, filePath):
+        with open(f"{filePath}/data.asc","w") as file: # !namex
             file.write(" ")
             file.write(str(round(self.Parr,4)))
             file.write("\t")
@@ -43,9 +43,9 @@ class sac2asc:
             file.write(str(round(self.t3,4)))
             file.write("\t")
             if self.zory == "z":
-                file.write("9")
+                file.write("z")
             elif self.zory == "y":
-                file.write("0")
+                file.write("y")
             file.write("\n") # !type
             for i in range(self.npts1):
                 t = (i-1)*self.dt1
