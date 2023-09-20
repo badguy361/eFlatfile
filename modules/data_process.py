@@ -6,12 +6,19 @@ from matplotlib import pyplot as plt
 import numpy as np
 from datetime import datetime
 import re
+import os
+import glob
 
 class dataProcess():
     def __init__(self):
         pass
     
-    def reName(self, file_name):
+    def reName(self, path, file_name):
+        """
+            revised formated
+            Before : TW.A002.10.HLE.D.2022.260.213900.SAC
+            After : TW.A002.10.HLE.D.20220917213900.SAC
+        """
         timestamp = file_name.split('.')[-4:-1] # date part
         year, day_of_year, time = timestamp
         time = time.zfill(6)
@@ -19,6 +26,7 @@ class dataProcess():
         converted_timestamp = formatted_timestamp.strftime('%Y%m%d%H%M%S')
         pattern = r'\d{4}\.\d{3}\.\d+'
         new_file_name = re.sub(pattern, converted_timestamp, file_name)
+        os.rename(f"{path}/{file_name}",f"{path}/{new_file_name}")
         return new_file_name
     
     def getArrivalTime(self, catlog ,model_name='iasp91'):
@@ -48,5 +56,10 @@ class dataProcess():
 
 if __name__ == '__main__':
     data = dataProcess()
-    new_file_name = data.reName('TW.A002.10.HLE.D.2022.260.213900.SAC')
+    path = "../TSMIP_Dataset/GuanshanChishangeq"
+    files = glob.glob(f"{path}/*.SAC")
+    file_names = [data.reName(path, os.path.basename(file)) for file in files]
+    # new_file_name = data.reName(file_names)
+    print(file_names)
+
     
