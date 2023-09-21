@@ -19,6 +19,16 @@ services:
       - ./TSMIP_Dataset:/app/TSMIP_Dataset
     depends_on:
       - mariadb
+  r:
+    image: r-base
+    ports:
+      - "7000:7000"
+    environment:
+      - DISPLAY=140.115.78.186:0.0
+    depends_on:
+      - mariadb
+    stdin_open: true
+    tty: true
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:

@@ -17,7 +17,7 @@ eq_condition: {
 }
 
 catalog_range: {
-    "stdate": '2023-01-01',
+    "stdate": '2018-01-01',
     "eddate": '2023-08-30',
     "stML": '0',
     "edML": '10',

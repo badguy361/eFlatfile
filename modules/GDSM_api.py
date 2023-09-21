@@ -63,15 +63,15 @@ class GDMS:
             eq_data = self.rs.post(get_waveform_url, data=eq_condition)
             if eq_data.json()["status"] == 1:
                 logger.info(
-                    "Get waveform success, please check infomation in GDMS website"
+                    "Get waveform successed, please check infomation in GDMS website"
                 )
             else:
                 logger.error(
-                    "Get waveform fail, please check get waveform information")
+                    "Get waveform failed, please check get waveform information")
 
             return eq_data
         except:
-            logger.error("Get waveform fail, please check base setting")
+            logger.error("Get waveform failed, please check base setting")
 
     def getCatalog(self):
         get_catalog_url = f"{self.api_url}/dbconnect/getCatalog.php"
@@ -81,10 +81,10 @@ class GDMS:
             eq_catalog = self.rs.post(get_catalog_url, data=catalog_range)
             if eq_catalog.status_code == 200:
                 logger.info(
-                    "Get catalog success, please check infomation in GDMS website")
+                    "Get catalog successed, please check infomation in GDMS website")
                 return eq_catalog.json()
         except:
-            logger.error("Get waveform fail")
+            logger.error("Get waveform failed")
 
     def listToCsv(self, list_data, csv_output_name):
         columns = ['event_id', 'date', 'time', 'ms', 'latitude', 'longitude', 'depth', 'ML',\
@@ -97,8 +97,9 @@ class GDMS:
 
 
 if __name__ == '__main__':
-    catalog = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
     gdms = GDMS()
-    # _ = gdms.getWaveform()
-    eq_catalog = gdms.getCatalog()
-    _ = gdms.listToCsv(eq_catalog, '../TSMIP_Dataset/GDMS_api_catalog.csv')
+    _ = gdms.getWaveform()
+    
+    # catalog = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
+    # eq_catalog = gdms.getCatalog()
+    # _ = gdms.listToCsv(eq_catalog, '../TSMIP_Dataset/GDMS_api_catalog.csv')

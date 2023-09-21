@@ -1,13 +1,13 @@
 import re
 import pandas as pd
 
-def setUpYaml(catalog):
+def setUpTimelist(catalog):
     date = catalog["date"].values
     time = catalog["time"].values
     combined_list = [f"{d}T{t}" for d, t in zip(date, time)]
     combined_string = '\\n'.join(combined_list)
 
-    with open('../config_backup.yml', 'r') as file:
+    with open('../config_template.yml', 'r') as file:
         lines = file.readlines()
 
     for i, line in enumerate(lines):
@@ -18,4 +18,4 @@ def setUpYaml(catalog):
         file.writelines(lines)
 
 catalog = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
-_ = setUpYaml(catalog)
+_ = setUpTimelist(catalog)
