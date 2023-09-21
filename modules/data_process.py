@@ -10,7 +10,7 @@ import os
 import glob
 
 
-class dataProcess():
+class SACProcess():
 
     def __init__(self):
         pass
@@ -33,8 +33,24 @@ class dataProcess():
         os.rename(f"{path}/{file_name}", f"{path}/{new_file_name}")
         return new_file_name
 
-    def buildRecordFile(self, path):
-        print(os.listdir(path))
+
+class catalogProcess():
+
+    def __init__(self, catalog):
+        self.catalog = catalog
+
+    def GMTtoTaiwanTime(self, date, time):
+        date_string = date + time
+        date_format = "%Y/%m/%d%H:%M:%S"
+        formatted_datetime = datetime.strptime(date_string, date_format)
+        time_difference = timedelta(hours=8)
+        new_datetime = formatted_datetime + time_difference
+        new_datetime = new_datetime.strftime('%Y%m%d%H%M%S')
+        return new_datetime
+
+    def addTaiwanTime(self, path, new_datetime, catalog_name):
+        self.catalog["taiwan_time"] = new_datetime
+        self.catalog.to_csv(f'{path}/{catalog_name}', index=False)
 
     def getArrivalTime(self, catlog, model_name='iasp91'):
         iasp91_P_arrival = []
@@ -64,46 +80,58 @@ class dataProcess():
                       mode='w')
 
 
-class catalogProcess():
+    # def mergeTime(self):
+    #     new_date = self.catalog['date'].str.replace("/", "")
+    #     new_time = self.catalog['time'].str.replace(":", "")
+    #     new_eqtime = new_date + new_time
+    #     return new_eqtime
 
-    def __init__(self, catalog):
-        self.catalog = catalog
+class recordProcess():
+    def __init__(self):
+        # self.path = ""
+        pass
 
-    def GMTtoTaiwanTime(self, date, time):
-        date_string = date + time
-        date_format = "%Y/%m/%d%H:%M:%S"
-        formatted_datetime = datetime.strptime(date_string, date_format)
-        time_difference = timedelta(hours=8)
-        new_datetime = formatted_datetime + time_difference
-        new_datetime = new_datetime.strftime('%Y%m%d%H%M%S')
-        return new_datetime
-
-    def addTaiwanTime(self, path, new_datetime):
-        self.catalog["taiwan_time"] = new_datetime
-        self.catalog.to_csv(f'{path}/output.csv', index=False)
-
-    def mergeTime(self):
-        new_date = self.catalog['date'].str.replace("/", "")
-        new_time = self.catalog['time'].str.replace(":", "")
-        new_eqtime = new_date + new_time
-        return new_eqtime
-
+    def getRecordDf(self, file_names, catalog):
+        """
+            To store the SAC file which matched with catalog
+        """
+        record = {'event_id':[],'file_name':[]}
+        for file_name in file_names:
+            for index, taiwan_time in enumerate(catalog['taiwan_time']):
+                if str(taiwan_time) in file_name:
+                    record['event_id'].append(catalog['event_id'][index])
+                    record['file_name'].append(file_name)
+        return record
+    
+    def buildRecordFile(self, record, record_name):
+        df_record = pd.DataFrame(record)
+        df_record.to_csv(f'{record_name}',index=False)
 
 if __name__ == '__main__':
-    # data = dataProcess()
+
+    # SACProcess
+    # sac_process = SACProcess()
     # path = "../TSMIP_Dataset/GuanshanChishangeq"
     # files = glob.glob(f"{path}/*.SAC")
-    # file_names = [data.reName(path, os.path.basename(file)) for file in files]
-    # print(file_names)
+    # file_names = [sac_process.reName(path, os.path.basename(file)) for file in files]
 
-    # data.buildRecordFile(path)
-
+    # catalogProcess
     path = "../TSMIP_Dataset"
-    catalog = pd.read_csv(f"{path}/GDMScatalog_test.csv")
-    catalog_process = catalogProcess(catalog)
-    new_datetime = []
-    for i in range(catalog.__len__()):
-        new_datetime.append(
-            catalog_process.GMTtoTaiwanTime(catalog['date'][i],
-                                            catalog['time'][i]))
-    _ = catalog_process.addTaiwanTime(path, new_datetime)
+    catalog_name = "GDMScatalog_test.csv"
+    catalog = pd.read_csv(f"{path}/{catalog_name}")
+    # catalog_process = catalogProcess(catalog)
+    # new_datetime = []
+    # for i in range(catalog.__len__()):
+    #     new_datetime.append(
+    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
+    #                                         catalog['time'][i]))
+    # _ = catalog_process.addTaiwanTime(path, new_datetime, catalog_name)
+
+    # recordProcess
+    record_process = recordProcess()
+    output_name = "/GDMSRecord_test.csv"
+    files = glob.glob(f"../TSMIP_Dataset/GuanshanChishangeq/*HLE*.SAC")
+    file_names = [os.path.basename(file) for file in files]
+    record = record_process.getRecordDf(file_names, catalog)
+    _ = record_process.buildRecordFile(record, path+output_name)
+    print(record)

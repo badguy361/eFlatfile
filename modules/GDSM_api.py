@@ -15,11 +15,11 @@ load_dotenv()
 
 
 class GDMS:
-    """A class for interacting with the IMF GO API and its following process."""
+    """A class for interacting with the GDMS API and its following process."""
 
     def __init__(self):
         """
-            Initialize the IMF_GO instance.
+            Initialize the GDMS instance.
         """
         self.api_url = config.get("api_url")
         self._login()
@@ -99,7 +99,7 @@ class GDMS:
 if __name__ == '__main__':
     gdms = GDMS()
     _ = gdms.getWaveform()
-    
+
     # catalog = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
     # eq_catalog = gdms.getCatalog()
     # _ = gdms.listToCsv(eq_catalog, '../TSMIP_Dataset/GDMS_api_catalog.csv')
