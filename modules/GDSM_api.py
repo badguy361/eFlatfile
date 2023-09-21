@@ -86,7 +86,7 @@ class GDMS:
         except:
             logger.error("Get waveform failed")
 
-    def listToCsv(self, list_data, csv_output_name):
+    def catalogToCsv(self, list_data, csv_output_name):
         columns = ['event_id', 'date', 'time', 'ms', 'latitude', 'longitude', 'depth', 'ML',\
                     'nstn', 'dmin', 'gap', 'trms', 'ERH', 'ERZ', 'fixed', 'nph', 'quality']
         with open(csv_output_name, mode='w', newline='') as file:
@@ -95,11 +95,24 @@ class GDMS:
             for row in list_data:
                 writer.writerow(row)
 
+    def getInstrumentResponse(self):
+        get_catalog_url = f"{self.api_url}/sendRespDownload.php"
+        instrument_response = config.get("instrument_response")
+
+        try:
+            results = self.rs.post(get_catalog_url, data=instrument_response)
+            if results.status_code == 200:
+                logger.info(
+                    "Get instrument response successed, please check infomation in GDMS website")
+
+        except:
+            logger.error("Get instrument response failed")
 
 if __name__ == '__main__':
     gdms = GDMS()
-    _ = gdms.getWaveform()
+    # _ = gdms.getWaveform()
+    _ = gdms.getInstrumentResponse()
 
     # catalog = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
     # eq_catalog = gdms.getCatalog()
-    # _ = gdms.listToCsv(eq_catalog, '../TSMIP_Dataset/GDMS_api_catalog.csv')
+    # _ = gdms.catalogToCsv(eq_catalog, '../TSMIP_Dataset/GDMS_api_catalog.csv')

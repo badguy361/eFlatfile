@@ -30,3 +30,14 @@ catalog_range: {
     "stlat": '20',
     "edlat": '26'
 }
+
+instrument_response: {
+    "output": "pz2",
+    "network": "TSMIP",
+    "station": "A002, A003,",
+    "channel": "HL?",
+    "location": "all",
+    "stDatetime": "2023-09-20",
+    "edDatetime": "2023-09-21",
+    "label": "response"
+}
