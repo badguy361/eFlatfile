@@ -12,12 +12,12 @@ eq_condition: {
     "location": "all",
     "dt1": -120,
     "dt2": 480,
-		'timelist': "2022-09-18T14:44:15",
+    "timelist": '2023-07-31T04:38:56',
     "label": "Test_function"
 }
 
 catalog_range: {
-    "stdate": '2018-01-01',
+    "stdate": '2023-01-01',
     "eddate": '2023-08-30',
     "stML": '0',
     "edML": '10',
@@ -32,12 +32,12 @@ catalog_range: {
 }
 
 instrument_response: {
-  "output": "pz2",
-  "network": "TSMIP",
-  "station": "A002, A003,",
-  "channel": "HL?",
-  "location": "all",
-  "stDatetime": "2023-09-20",
-  "edDatetime": "2023-09-21",
-  "label": "response"
+    "output": "pz2",
+    "network": "TSMIP",
+    "station": "A002, A003,",
+    "channel": "HL?",
+    "location": "all",
+    "stDatetime": "2023-09-20",
+    "edDatetime": "2023-09-21",
+    "label": "response"
 }
