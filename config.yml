@@ -13,7 +13,7 @@ eq_condition: {
     "dt1": -120,
     "dt2": 480,
 		'timelist': "2022-09-18T14:44:15",
-    "label": "Test_function"
+    "label": "Test_function_"
 }
 
 catalog_range: {
