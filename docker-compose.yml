@@ -6,21 +6,34 @@ services:
       MYSQL_ROOT_PASSWORD: edream2023
       MYSQL_DATABASE: mydatabase
     ports:
-      - "3306:3306"
+      - "3305:3305"
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
   python_sac:
     build: ./
     ports:
-      - "8000:8000"
+      - "7000:7000"
     depends_on:
       - mariadb
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: mariadb
-      PMA_PORT: 3306
+      PMA_PORT: 3305
     ports:
-      - "8080:80"
+      - "7171:80"
     depends_on:
       - mariadb
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "7070:8080"
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+    networks:
+      - jenkinsnet
+
+networks:
+  jenkinsnet:
