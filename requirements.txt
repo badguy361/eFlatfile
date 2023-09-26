@@ -4,3 +4,4 @@ matplotlib==3.5.1
 python-dotenv==1.0.0
 ruamel.yaml==0.17.32
 tqdm==4.64.1
+
