@@ -15,7 +15,9 @@ load_dotenv()
 
 
 class GDMS:
-    """A class for interacting with the GDMS API and its following process."""
+    """
+        A class for interacting with the GDMS API and its following process.
+    """
 
     def __init__(self):
         """
@@ -27,9 +29,6 @@ class GDMS:
     def _login(self):
         """
             Log in to the GDMS API and set the authorization token in the request headers.
-
-            Returns:
-                None
         """
         login_url = f"{self.api_url}/loginProcess.php"
         login_data = {
@@ -53,9 +52,6 @@ class GDMS:
     def getWaveform(self):
         """
             Get special condition date waveform through api
-
-            Returns:
-                None
         """
         get_waveform_url = f"{self.api_url}/sendEqdownload.php"
         eq_condition = config.get("eq_condition")
@@ -74,6 +70,9 @@ class GDMS:
             logger.error("Get waveform failed, please check base setting")
 
     def getCatalog(self):
+        """
+            Get CWB catalog through api
+        """
         get_catalog_url = f"{self.api_url}/dbconnect/getCatalog.php"
         catalog_range = config.get("catalog_range")
 
@@ -87,6 +86,11 @@ class GDMS:
             logger.error("Get waveform failed")
 
     def catalogToCsv(self, list_data, csv_output_name):
+        """
+            Transform CWB json catalog to csv file
+            Input: list record
+            Output: csv file
+        """
         columns = ['event_id', 'date', 'time', 'ms', 'latitude', 'longitude', 'depth', 'ML',\
                     'nstn', 'dmin', 'gap', 'trms', 'ERH', 'ERZ', 'fixed', 'nph', 'quality']
         with open(csv_output_name, mode='w', newline='') as file:
@@ -96,6 +100,9 @@ class GDMS:
                 writer.writerow(row)
 
     def getInstrumentResponse(self):
+        """
+            Get Instrument Response through api
+        """
         get_catalog_url = f"{self.api_url}/sendRespDownload.php"
         instrument_response = config.get("instrument_response")
 

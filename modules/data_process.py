@@ -40,6 +40,11 @@ class catalogProcess():
         self.catalog = catalog
 
     def GMTtoTaiwanTime(self, date, time):
+        """
+            To change CWB catalog GMT+0 time to GMT+8 Taiwan time
+            Input: 2018/1/101:46:04
+            Output: 20180101014604
+        """
         date_string = date + time
         date_format = "%Y/%m/%d%H:%M:%S"
         formatted_datetime = datetime.strptime(date_string, date_format)
@@ -49,7 +54,14 @@ class catalogProcess():
         return new_datetime
 
     def addTaiwanTime(self, path, new_datetime, catalog_name):
+        """
+            Add GMT+8 Taiwan time to catalog
+        """
         self.catalog["taiwan_time"] = new_datetime
+        self.catalog.to_csv(f'{path}/{catalog_name}', index=False)
+
+    def addMw(self, path, new_datetime, catalog_name):
+        self.catalog["ML"] = self.catalog["ML"]*2 # TODO
         self.catalog.to_csv(f'{path}/{catalog_name}', index=False)
 
     def getArrivalTime(self, catlog, model_name='iasp91'):

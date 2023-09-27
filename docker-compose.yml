@@ -3,8 +3,19 @@ services:
   python_sac:
     build: ./
     ports:
-      - "7000:7000"
-    depends_on:
-      - mariadb
+      - "8000:7000"
+    environment:
+      - DISPLAY=140.115.78.186:0.0
+    volumes:
+      - ./TSMIP_Dataset:/app/TSMIP_Dataset
+    stdin_open: true
+    tty: true
+
+  r:
+    image: r-base
+    ports:
+      - "7001:7000"
+    environment:
+      - DISPLAY=140.115.78.186:0.0
     stdin_open: true
     tty: true

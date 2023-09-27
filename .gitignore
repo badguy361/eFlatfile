@@ -2,12 +2,10 @@
 *.mseed
 *.tgz
 *.gz
-<<<<<<< HEAD
-jenkins_home
-=======
 *.SAC
 *.asc
->>>>>>> f30d6a9c702342c056c7fec3343278253d97c131
+InstrumentResponse
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

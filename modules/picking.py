@@ -11,10 +11,10 @@ from obspy import UTCDateTime
 
 from sac2asc import sac2asc
 from obspy.io.sac import SACTrace
-from data_process import dataProcess
+from data_process import SACProcess
 
 
-class picking(dataProcess):
+class picking(SACProcess):
 
     def __init__(self, sac_path, asc_path):
         super().__init__()
@@ -25,12 +25,18 @@ class picking(dataProcess):
         self.zory = ''
 
     def readFile(self, year, mon):
+        """
+            Read all SAC file downloaded from TSMIP
+            Output: ['TW.A002.10.HLE.D.20220918144415.SAC', 'TW.A003.10.HLE.D.20220918144415.SAC',...]
+        """
         total_files = glob.glob(f"{self.sac_path}/*HLE*.SAC")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
 
     def openFile(self, file_names, num):
-
+        """
+            To open file through SAC package ppk mode
+        """
         for index, file_name in enumerate(file_names[num - 1::]):
             HLE = file_name
             HLN = re.sub("HLE", "HLN", file_name)
@@ -38,7 +44,7 @@ class picking(dataProcess):
             s = f"r {self.sac_path}/{HLZ} \
                 {self.sac_path}/{HLE} \
                 {self.sac_path}/{HLN} \n"
-            # 畫圖 ＆ 顯示資訊 + pick mode
+
             s += "qdp of \n"
             s += "ppk m \n"
             s += "w over \n"
@@ -54,9 +60,12 @@ class picking(dataProcess):
 
             self.inputResult(file_name)
             if self.zory != '':
-                self.sacToAsc(file_name, sac1, sac2 , sacZ, self.zory)
+                self.sacToAsc(file_name, sac1, sac2, sacZ, self.zory)
 
     def inputResult(self, file_name):
+        """
+            To determine the output by Y or Z or 1-5
+        """
         print("Accept [Y/y] or Accpet but Z [Z/z] or Reject [Others]?")
         check = input()
         if check == "Y" or check == "y":
@@ -87,19 +96,24 @@ class picking(dataProcess):
             print("NO DEFINE!!!")
             self.result[num] = [file_name, "NO DEFINE"]
 
-    def sacToAsc(self, file_name, sac1, sac2 , sacZ, zory):
+    def sacToAsc(self, file_name, sac1, sac2, sacZ, zory):
+        """
+            To change result sac file to asc file
+        """
         data = sac2asc(sacZ, sac1, sac2, zory)
         data.__call__(asc_path)
         os.rename(f'{asc_path}/data.asc', f'{asc_path}/{file_name}.asc')
 
     def getDist(self):
         pass
-    
+
     def getMw(self):
         pass
 
     def getArrivalTime(self):
         pass
+
+
 if __name__ == '__main__':
     year = "2021"
     mon = "05"
@@ -109,4 +123,4 @@ if __name__ == '__main__':
 
     pick = picking(sac_path, asc_path)
     file_names = pick.readFile(year, mon)
-    _ = pick.openFile(file_names, num)
+    # _ = pick.openFile(file_names, num)
