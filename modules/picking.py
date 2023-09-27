@@ -1,23 +1,15 @@
 import os
 import glob
-import pandas as pd
-from matplotlib import pyplot as plt
 import re
 import subprocess
-import obspy
-from obspy import read
-from obspy.clients.fdsn import Client
-from obspy import UTCDateTime
 
 from sac2asc import sac2asc
 from obspy.io.sac import SACTrace
-from data_process import SACProcess
 
 
-class picking(SACProcess):
+class picking():
 
     def __init__(self, sac_path, asc_path):
-        super().__init__()
         os.putenv("SAC_DISPLAY_COPYRIGHT", "0")
         self.sac_path = sac_path
         self.asc_path = asc_path

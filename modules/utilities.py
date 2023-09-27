@@ -2,6 +2,9 @@ import re
 import pandas as pd
 
 def setUpTimelist(catalog):
+    """
+        set up time list in yml file which base on config_template.yml
+    """
     date = catalog["date"].values
     time = catalog["time"].values
     combined_list = [f"{d}T{t}" for d, t in zip(date, time)]
