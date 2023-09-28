@@ -1,5 +1,7 @@
 # api_url for GDMS
-api_url: https://gdms.cwa.gov.tw/php
+api_url: https://gdms.cwa.gov.tw
+download_path: E:\\Yu\\eFlatfile\\TSMIP_Dataset
+
 
 # log_level ERROR > WARNING > INFO > DEBUG
 log_level: DEBUG
