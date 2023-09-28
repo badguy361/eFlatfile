@@ -3,7 +3,6 @@ USE TSMIP;
 
 CREATE TABLE eq_catalog (
     event_id VARCHAR(50) PRIMARY KEY,
-    file_name VARCHAR(100),
     date VARCHAR(15),
     time VARCHAR(10),
     ms Float,
