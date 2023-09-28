@@ -1,9 +1,14 @@
 import re
 import pandas as pd
+import tarfile
+import glob
+import os
 
 def setUpTimelist(catalog):
     """
         set up time list in yml file which base on config_template.yml
+        Input: catalog.csv
+        Output: config.yml
     """
     date = catalog["date"].values
     time = catalog["time"].values
@@ -20,5 +25,15 @@ def setUpTimelist(catalog):
     with open('../config.yml', 'w') as file:
         file.writelines(lines)
 
-catalog = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
-_ = setUpTimelist(catalog)
+def auto_unzip(zipdata, unzip_path):
+    with tarfile.open(zipdata, 'r:gz') as tar:
+        tar.extractall(unzip_path)
+
+if __name__ == '__main__':
+    # catalog = pd.read_csv("../TSMIP_Dataset/GDMScatalog_test.csv")
+    # _ = setUpTimelist(catalog)
+
+    zipdatas = glob.glob(f"../TSMIP_Dataset/InstrumentResponse/rowdata/*.tgz")
+    unzip_path = '../TSMIP_Dataset/InstrumentResponse'
+    for zipdata in zipdatas:
+        _ = auto_unzip(zipdata, unzip_path)
