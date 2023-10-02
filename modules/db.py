@@ -18,6 +18,7 @@ class Catalog(Base):
     eq_lon = Column(Float)
     eq_depth = Column(Float)
     ML = Column(Float)
+    Mw = Column(Float)
     nstn = Column(Integer)
     dmin = Column(Float)
     gap = Column(Integer)
@@ -35,13 +36,16 @@ class waveformPicking(Base):
     id = Column(Integer, primary_key=True)
     event_id = Column(String)
     file_name = Column(String)
+    station = Column(String)
+    sta_lon = Column(Float)
+    sta_lat = Column(Float)
+    sta_dist = Column(Float)
     save = Column(String)
     start_time_T4 = Column(Float)
     end_time_T3 = Column(Float)
     p_arrival_T1 = Column(Float)
     s_arrival_T2 = Column(Float)
     filter_id = Column(String)
-
 
 def create_session(database_url):
     engine = create_engine(database_url)
@@ -54,7 +58,7 @@ def insert_data(session, model_class, **kwargs):
     session.add(new_data)
     session.commit()
 
-
+    
 if __name__ == "__main__":
     db_url = os.getenv("DATABASE_URL")
     session = create_session(db_url)
