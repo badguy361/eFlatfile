@@ -8,45 +8,27 @@ import os
 import glob
 import numpy as np
 import subprocess
+from db import waveformPicking, insert_data
 
 class SACProcess():
 
-    def __init__(self, sac_path, instrument_path):
+    def __init__(self, sac_path):
         os.putenv("SAC_DISPLAY_COPYRIGHT", "0")
         self.sac_path = sac_path
-        self.instrument_path = instrument_path
 
-    def readSACFile(self, sta, date):
-        total_files = glob.glob(f"{self.sac_path}/*{sta}*{date}*.SAC")
+    def readSACFile(self, date):
+        total_files = glob.glob(f"{self.sac_path}/*HLE*{date}*.SAC")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
 
-    def readInstrumentFile(self, sta):
-        total_files = glob.glob(f"{self.instrument_path}/{sta}/*.99999")
-        file_names = [os.path.basename(_) for _ in total_files]
-        return file_names
-
-    def removeInstrumentResponse(self, sac_file, instrument, sta):
-        """
-            The steps are from CWA website
-            ref: https://gdms.cwa.gov.tw/help.php
-        """
-        s = f"r {self.sac_path}/{sac_file} \n"
-        s += "rmean; rtrend \n"
-        s += "taper \n"
-        s += f"trans from polezero s {self.instrument_path}/{sta}/{instrument} to acc freq 0.02 0.1 1 10 \n"
-        s += f"w aaa.SAC \n"
-        subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
-                s.encode())  # show the interactivate window
-
-    def getStationInfo(filename):
+    def getStationInfo(self, filenames):
         """
             To get station infomation from SAC file name
-            Input : TW.C096.10.HLN.D.20220918145412.SAC
-            Output : C096
+            Input : ['TW.C096.10.HLN.D.20220918145412.SAC',...]
+            Output : ['C096',..]
         """
-        station_name = filename.split('.')[1]
-        return station_name
+        station_names = [filename.split('.')[1] for filename in filenames]
+        return station_names
 
     def reName(self, path, file_name):
         """
@@ -166,8 +148,7 @@ if __name__ == '__main__':
 
     # SACProcess
     sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
-    instrument_path = "../TSMIP_Dataset/InstrumentResponse"
-    sac_process = SACProcess(sac_path, instrument_path)
+    sac_process = SACProcess(sac_path)
     stations = [
         'A002', 'A003', 'A004', 'A007', 'A008', 'A009', 'A010', 'A013', 'A014',
         'A015', 'A016', 'A020', 'A024', 'A025', 'A026', 'A030', 'A032', 'A034',
@@ -216,13 +197,9 @@ if __name__ == '__main__':
         'G060', 'G061', 'I002', 'J001'
     ]
     date = "20220918"
-    for sta in stations:
-        if sta == "A052":
-            sac_files = sac_process.readSACFile(sta, date)
-            instrument_files = sac_process.readInstrumentFile(sta)
-            print(instrument_files)
-            print(sac_files)
-            sac_process.removeInstrumentResponse(sac_files[0], instrument_files[0], sta)
+    sac_files = sac_process.readSACFile(date)
+    station_names = sac_process.getStationInfo(sac_files)
+    print(station_names)
     # file_names = [sac_process.reName(path, os.path.basename(file)) for file in files]
 
     # catalogProcess
