@@ -1,11 +1,7 @@
 import pandas as pd
 
-df=pd.read_csv("GDMS_Record_test.csv")
+df=pd.read_csv("GDMS_stations.csv")
 
-file=df["file_name"]
+df["station"] = df["station"].str.slice(0, 4)
 
-sta_list = []
-for i in file:
-    sta_list.append(i.split(".")[1])
-
-sta_str = ', '.join(sta_list)
+df.to_csv("GDMS_stations.csv",index=False)

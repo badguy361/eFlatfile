@@ -6,6 +6,7 @@ CREATE TABLE eq_catalog (
     date VARCHAR(15),
     time VARCHAR(10),
     ms Float,
+    taiwan_time VARCHAR(20),
     eq_lat Float(10),
     eq_lon Float(10),
     eq_depth Float(10),
@@ -19,17 +20,13 @@ CREATE TABLE eq_catalog (
     ERZ Float(5),
     fixed VARCHAR(5),
     nph INT(5),
-    quality VARCHAR(1),
-    taiwan_time VARCHAR(20)
+    quality VARCHAR(1)
 );
 
 CREATE TABLE waveform_picking (
-    id INT PRIMARY KEY AUTO_INCREMENT,
     event_id VARCHAR(50),
-    file_name VARCHAR(50),
+    file_name VARCHAR(50) PRIMARY KEY,
     station VARCHAR(10),
-    sta_lon Float,
-    sta_lat Float,
     sta_dist Float,
     save VARCHAR(1),
     start_time_T4 Float(5),
@@ -39,5 +36,13 @@ CREATE TABLE waveform_picking (
     filter_id VARCHAR(50),
 
     FOREIGN KEY (event_id) REFERENCES eq_catalog(event_id)
+    FOREIGN KEY (station) REFERENCES station_infomation(station)
+)
+
+CREATE TABLE station_infomation (
+    station VARCHAR(10) PRIMARY KEY,
+    lon Float,
+    lat Float,
+    dep Float
 
 )
