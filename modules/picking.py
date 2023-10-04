@@ -2,6 +2,7 @@ import os
 import glob
 import re
 import subprocess
+import pandas as pd
 
 from sac2asc import sac2asc
 from obspy.io.sac import SACTrace
@@ -119,11 +120,18 @@ class picking():
         data.__call__(asc_path)
         os.rename(f'{asc_path}/data.asc', f'{asc_path}/{file_name}.asc')
 
-    def getDist(self):
-        pass
+    def getDist(self, records ,sac_HLE):
+        """
+            Input: sac_HLE = "TW.A002.10.HLE.D.20220918144415.SAC" ; records = record.csv
+            Output: sta_dist
+        """
+        sta_dist = records[records['file_name'] == sac_HLE]["sta_dist"]
+        return sta_dist
 
-    def getMw(self):
-        pass
+    def getMw(self, records ,catalog, sac_HLE):
+        results = pd.merge(records, catalog, on='event_id', how='inner')
+        Mw = results[results['file_name'] == sac_HLE]["Mw"]
+        return Mw
 
     def getArrivalTime(self):
         pass
@@ -135,7 +143,17 @@ if __name__ == '__main__':
     num = 1
     sac_path = f"../TSMIP_Dataset/GuanshanChishangeq"
     asc_path = f"../TSMIP_Dataset/picking_result"
+    instrument_path = f"../TSMIP_Dataset/InstrumentResponse"
 
-    pick = picking(sac_path, asc_path)
-    file_names = pick.readFile(year, mon)
+    pick = picking(sac_path, asc_path, instrument_path)
+    file_names = pick.readSACFile(year, mon)
     # _ = pick.openFile(file_names, num)
+
+    path = "../TSMIP_Dataset"
+    record_name = "GDMS_Record.csv"
+    catalog_name = "GDMS_catalog.csv"
+    records = pd.read_csv(f"{path}/{record_name}")
+    catalog = pd.read_csv(f"{path}/{catalog_name}")
+    dist = pick.getDist(records, "TW.A002.10.HLE.D.20220918144415.SAC")
+    Mw = pick.getMw(records, catalog, "TW.A002.10.HLE.D.20220918144415.SAC")
+
