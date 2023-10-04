@@ -116,6 +116,13 @@ class recordProcess():
     def __init__(self):
         # self.path = ""
         pass
+    
+    def getDistance(self, catalog, records, stations):
+        tmp = pd.merge(records, catalog, on='event_id', how='inner')
+        result = pd.merge(tmp, stations, on='station', how='inner')
+        result["sta_dist"] = (((result["longitude"]-result["lon"])*101.7)**2 +  ((result["latitude"]-result["lat"])*110.9)**2 +  (result["depth"]-result["dep"])**2)**(1/2)
+        return result["sta_dist"]
+
 
     def getRecordDf(self, file_names, catalog):
         """
@@ -193,27 +200,32 @@ if __name__ == '__main__':
     # file_names = [sac_process.reName(path, os.path.basename(file)) for file in files]
 
     # catalogProcess
-    path = "../TSMIP_Dataset"
-    catalog_name = "GDMS_catalog.csv"
-    catalog = pd.read_csv(f"{path}/{catalog_name}")
-    catalog_process = catalogProcess(catalog)
-    new_datetime = []
-    for i in range(catalog.__len__()):
-        new_datetime.append(
-            catalog_process.GMTtoTaiwanTime(catalog['date'][i],
-                                            catalog['time'][i]))
-    _ = catalog_process.addTaiwanTime(path, new_datetime, catalog_name)
-    _ = catalog_process.addMw(path, catalog_name)
-
-    # recordProcess
-    # record_process = recordProcess()
     # path = "../TSMIP_Dataset"
     # catalog_name = "GDMS_catalog.csv"
     # catalog = pd.read_csv(f"{path}/{catalog_name}")
-    # output_name = "/GDMS_Record.csv"
+    # catalog_process = catalogProcess(catalog)
+    # new_datetime = []
+    # for i in range(catalog.__len__()):
+    #     new_datetime.append(
+    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
+    #                                         catalog['time'][i]))
+    # _ = catalog_process.addTaiwanTime(path, new_datetime, catalog_name)
+    # _ = catalog_process.addMw(path, catalog_name)
+
+    # recordProcess
+    record_process = recordProcess()
+    path = "../TSMIP_Dataset"
+    catalog_name = "GDMS_catalog.csv"
+    catalog = pd.read_csv(f"{path}/{catalog_name}")
+    output_name = "/GDMS_Record.csv"
     # sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
     # sac_process = SACProcess(sac_path)
     # file_names = sac_process.readSACFile("0918")
     # record = record_process.getRecordDf(file_names, catalog)
     # _ = record_process.buildRecordFile(record, path+output_name)
-    # print(record)
+    records = pd.read_csv(f"{path}/{output_name}")
+    stations_name = "/GDMS_stations.csv"
+    stations = pd.read_csv(f"{path}/{stations_name}")
+    result = record_process.getDistance(catalog, records, stations)
+    records["sta_dist"] = result
+    _ = record_process.buildRecordFile(records, path+output_name)
