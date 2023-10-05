@@ -52,20 +52,24 @@ class picking():
             sac_HLE = sac_file_name
             sac_HLN = re.sub("HLE", "HLN", sac_file_name)
             sac_HLZ = re.sub("HLE", "HLZ", sac_file_name)
-            Dist = round(self.getDist(sac_file_name),2)
+            Dist = round(self.getDist(sac_file_name), 2)
             Mw = self.getMw(sac_file_name)
+            P_arrive , S_arrive = self.getArrivalTime(sac_file_name)
 
             s = f"r {self.sac_path}/{sac_HLZ} \
                 {self.sac_path}/{sac_HLE} \
                 {self.sac_path}/{sac_HLN} \n"
-            
+
             #instrument response steps
-            s += "rmean; rtrend \n" 
+            s += "rmean; rtrend \n"
             s += "taper \n"
             s += f"trans from polezero s {self.instrument_path}/{sta}/{instrument_file_names[0]} \
                     to acc freq 0.02 0.1 1 10 \n"
 
             s += "qdp of \n"
+            #auto picking
+            s += f"ch t1 {P_arrive} t2 {S_arrive} \n"
+            s += "p1 \n"
             s += f"title DIST={Dist}_Mw={Mw} Location BOTTOM size large \n"
             s += "ppk m \n"
             s += "w over \n"
@@ -132,16 +136,22 @@ class picking():
             Input: sac_HLE = "TW.A002.10.HLE.D.20220918144415.SAC" ; records = record.csv
             Output: sta_dist
         """
-        sta_dist = self.record[self.record['file_name'] == sac_HLE]["sta_dist"][0]
+        sta_dist = self.record[self.record['file_name'] ==
+                               sac_HLE]["sta_dist"][0]
         return sta_dist
 
     def getMw(self, sac_HLE):
-        results = pd.merge(self.record, self.catalog, on='event_id', how='inner')
+        results = pd.merge(self.record,
+                           self.catalog,
+                           on='event_id',
+                           how='inner')
         Mw = results[results['file_name'] == sac_HLE]["Mw"][0]
         return Mw
 
-    def getArrivalTime(self):
-        pass
+    def getArrivalTime(self, sac_HLE):
+        P_arrive = self.record[self.record["file_name"] == sac_HLE]["iasp91_P_arrival"][0]+120
+        S_arrive = self.record[self.record["file_name"] == sac_HLE]["iasp91_S_arrival"][0]+120
+        return P_arrive, S_arrive
 
 
 if __name__ == '__main__':
@@ -161,5 +171,3 @@ if __name__ == '__main__':
     pick = picking(sac_path, asc_path, instrument_path, records, catalog)
     file_names = pick.readSACFile(year, mon)
     _ = pick.openFile(file_names, num)
-
-
