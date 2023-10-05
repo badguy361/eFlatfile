@@ -8,7 +8,6 @@ import os
 import glob
 import numpy as np
 import subprocess
-from db import waveformPicking, insert_data
 
 class SACProcess():
 
@@ -123,6 +122,24 @@ class recordProcess():
         result["sta_dist"] = (((result["longitude"]-result["lon"])*101.7)**2 +  ((result["latitude"]-result["lat"])*110.9)**2 +  (result["depth"]-result["dep"])**2)**(1/2)
         return result["sta_dist"]
 
+    def getArrivalTime(self, catalog, records):
+        result = pd.merge(records, catalog, on='event_id', how='inner')
+        iasp91_P_arrival = []
+        iasp91_S_arrival = []
+        for i in tqdm(range(result.shape[0])):
+            try:
+                model = TauPyModel(model='iasp91') #jb pwdk can test 
+                dist = kilometer2degrees(result["sta_dist"][i]) 
+                depth = result["depth"][i]
+                arrivals = model.get_travel_times\
+                    (source_depth_in_km=depth, distance_in_degree=dist,\
+                    phase_list=["P","S",'p','s'])
+                iasp91_P_arrival.append(arrivals[0].time)
+                iasp91_S_arrival.append(arrivals[-1].time)
+            except:
+                iasp91_P_arrival.append("NA")
+                iasp91_S_arrival.append("NA")
+        return iasp91_P_arrival, iasp91_S_arrival
 
     def getRecordDf(self, file_names, catalog):
         """
@@ -140,7 +157,7 @@ class recordProcess():
 
     def buildRecordFile(self, record, record_name):
         df_record = pd.DataFrame(record)
-        df_record.to_csv(f'{record_name}', index=False)
+        df_record.to_csv(f'/{record_name}', index=False)
 
 
 if __name__ == '__main__':
@@ -217,15 +234,19 @@ if __name__ == '__main__':
     path = "../TSMIP_Dataset"
     catalog_name = "GDMS_catalog.csv"
     catalog = pd.read_csv(f"{path}/{catalog_name}")
-    output_name = "/GDMS_Record.csv"
+    output_name = "GDMS_Record.csv"
     # sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
     # sac_process = SACProcess(sac_path)
     # file_names = sac_process.readSACFile("0918")
     # record = record_process.getRecordDf(file_names, catalog)
     # _ = record_process.buildRecordFile(record, path+output_name)
+
     records = pd.read_csv(f"{path}/{output_name}")
-    stations_name = "/GDMS_stations.csv"
-    stations = pd.read_csv(f"{path}/{stations_name}")
-    result = record_process.getDistance(catalog, records, stations)
-    records["sta_dist"] = result
+    stations_name = "GDMS_stations.csv"
+    # stations = pd.read_csv(f"{path}/{stations_name}")
+    # result = record_process.getDistance(catalog, records, stations)
+    # records["sta_dist"] = result
+    iasp91_P_arrival, iasp91_S_arrival = record_process.getArrivalTime(catalog, records)
+    records["iasp91_P_arrival"] = iasp91_P_arrival
+    records["iasp91_S_arrival"] = iasp91_S_arrival
     _ = record_process.buildRecordFile(records, path+output_name)
