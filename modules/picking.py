@@ -10,11 +10,13 @@ from obspy.io.sac import SACTrace
 
 class picking():
 
-    def __init__(self, sac_path, asc_path, instrument_path):
+    def __init__(self, sac_path, asc_path, instrument_path, record, catalog):
         os.putenv("SAC_DISPLAY_COPYRIGHT", "0")
         self.sac_path = sac_path
         self.asc_path = asc_path
         self.instrument_path = instrument_path
+        self.record = record
+        self.catalog = catalog
         self.result = {}
         self.zory = ''
 
@@ -31,11 +33,11 @@ class picking():
         """
             Output: ['SAC_PZs_TW_A002_HLE_10_2019.051.00.00.00.0000_2599.365.23.59.59.99999',..]
         """
-        total_files = glob.glob(f"{self.instrument_path}/{sta}/*HLE*.99999")
+        total_files = glob.glob(f"{self.instrument_path}/{sta}/*All*.99999")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
 
-    def openFile(self, sac_file_names, instrument_file_names, num):
+    def openFile(self, sac_file_names, num):
         """
             To open file through SAC package ppk mode
             
@@ -50,6 +52,9 @@ class picking():
             sac_HLE = sac_file_name
             sac_HLN = re.sub("HLE", "HLN", sac_file_name)
             sac_HLZ = re.sub("HLE", "HLZ", sac_file_name)
+            Dist = round(self.getDist(sac_file_name),2)
+            Mw = self.getMw(sac_file_name)
+
             s = f"r {self.sac_path}/{sac_HLZ} \
                 {self.sac_path}/{sac_HLE} \
                 {self.sac_path}/{sac_HLN} \n"
@@ -57,12 +62,11 @@ class picking():
             #instrument response steps
             s += "rmean; rtrend \n" 
             s += "taper \n"
-            s += f"trans from polezero s {self.instrument_path}/{sta}/{instrument_file_names[2]} \
-                                        {self.instrument_path}/{sta}/{instrument_file_names[0]} \
-                                        {self.instrument_path}/{sta}/{instrument_file_names[1]} \
+            s += f"trans from polezero s {self.instrument_path}/{sta}/{instrument_file_names[0]} \
                     to acc freq 0.02 0.1 1 10 \n"
 
             s += "qdp of \n"
+            s += f"title DIST={Dist}_Mw={Mw} Location BOTTOM size large \n"
             s += "ppk m \n"
             s += "w over \n"
             s += "q \n"
@@ -74,7 +78,10 @@ class picking():
             sacZ = SACTrace.read(f"{self.sac_path}/{sac_HLZ}")
             # print(type(sac1.data[1]))
             # print(sac1.reftime)
-            return sac1,sac2,sacZ
+
+            self.inputResult(sac_file_name)
+            if self.zory != '':
+                self.sacToAsc(sac_file_name, sac1, sac2, sacZ, self.zory)
 
     def inputResult(self, sac_file_name):
         """
@@ -120,17 +127,17 @@ class picking():
         data.__call__(asc_path)
         os.rename(f'{asc_path}/data.asc', f'{asc_path}/{file_name}.asc')
 
-    def getDist(self, records ,sac_HLE):
+    def getDist(self, sac_HLE):
         """
             Input: sac_HLE = "TW.A002.10.HLE.D.20220918144415.SAC" ; records = record.csv
             Output: sta_dist
         """
-        sta_dist = records[records['file_name'] == sac_HLE]["sta_dist"]
+        sta_dist = self.record[self.record['file_name'] == sac_HLE]["sta_dist"][0]
         return sta_dist
 
-    def getMw(self, records ,catalog, sac_HLE):
-        results = pd.merge(records, catalog, on='event_id', how='inner')
-        Mw = results[results['file_name'] == sac_HLE]["Mw"]
+    def getMw(self, sac_HLE):
+        results = pd.merge(self.record, self.catalog, on='event_id', how='inner')
+        Mw = results[results['file_name'] == sac_HLE]["Mw"][0]
         return Mw
 
     def getArrivalTime(self):
@@ -141,19 +148,18 @@ if __name__ == '__main__':
     year = "2021"
     mon = "05"
     num = 1
-    sac_path = f"../TSMIP_Dataset/GuanshanChishangeq"
+    sac_path = f"../TSMIP_Dataset/GuanshanChishangeq/rowdata"
     asc_path = f"../TSMIP_Dataset/picking_result"
     instrument_path = f"../TSMIP_Dataset/InstrumentResponse"
-
-    pick = picking(sac_path, asc_path, instrument_path)
-    file_names = pick.readSACFile(year, mon)
-    # _ = pick.openFile(file_names, num)
 
     path = "../TSMIP_Dataset"
     record_name = "GDMS_Record.csv"
     catalog_name = "GDMS_catalog.csv"
     records = pd.read_csv(f"{path}/{record_name}")
     catalog = pd.read_csv(f"{path}/{catalog_name}")
-    dist = pick.getDist(records, "TW.A002.10.HLE.D.20220918144415.SAC")
-    Mw = pick.getMw(records, catalog, "TW.A002.10.HLE.D.20220918144415.SAC")
+
+    pick = picking(sac_path, asc_path, instrument_path, records, catalog)
+    file_names = pick.readSACFile(year, mon)
+    _ = pick.openFile(file_names, num)
+
 
