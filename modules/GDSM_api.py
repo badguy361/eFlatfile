@@ -181,6 +181,11 @@ class GDMS():
                 time.sleep(0.5)
 
     def getDownloadUrl(self, html_file, download_time):
+        """
+            To get download zip link from html file
+            Input : html file which download from GDMS website
+            Output : download zip link
+        """
         with open(html_file, 'r', encoding='utf-8') as file:
             html_content = file.read()
         soup = BeautifulSoup(html_content, 'html.parser')
@@ -198,6 +203,9 @@ class GDMS():
         return link_elements
 
     def downloadData(self, download_link, output_name):
+        """
+            To download infomation from download link
+        """
         response = self.rs.get(download_link)
         if response.status_code == 200:
             with open(f'{self.output_path}/InstrumentResponse/{output_name}', 'wb') as file:
@@ -212,7 +220,7 @@ if __name__ == '__main__':
     # _ = gdms.getWaveform()
     # _ = gdms.getInstrumentResponse()
     html_file = "download_page.html"
-    download_time = '2023-09-28 14:'
+    download_time = '2023-10-11 09:'
     link_elements = gdms.getDownloadUrl(html_file, download_time)
     for index, link_element in enumerate(link_elements):
         _ = gdms.downloadData(link_element, link_elements[index][-8:])

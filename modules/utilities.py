@@ -26,6 +26,12 @@ def setUpTimelist(catalog):
         file.writelines(lines)
 
 def auto_unzip(zipdata, unzip_path):
+    """
+        To unzip total instrumentResponse file which download from GDSN website
+        Input :      
+            zipdatas = glob.glob(f"../TSMIP_Dataset/InstrumentResponse/rowdata/*.tgz")
+            unzip_path = '../TSMIP_Dataset/InstrumentResponse'
+    """
     with tarfile.open(zipdata, 'r:gz') as tar:
         tar.extractall(unzip_path)
 
