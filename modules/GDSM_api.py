@@ -220,7 +220,7 @@ if __name__ == '__main__':
     # _ = gdms.getWaveform()
     # _ = gdms.getInstrumentResponse()
     html_file = "download_page.html"
-    download_time = '2023-10-11 09:'
+    download_time = '2023-10-11 08:'
     link_elements = gdms.getDownloadUrl(html_file, download_time)
     for index, link_element in enumerate(link_elements):
         _ = gdms.downloadData(link_element, link_elements[index][-8:])

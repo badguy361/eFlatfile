@@ -163,8 +163,8 @@ class recordProcess():
 if __name__ == '__main__':
 
     # SACProcess
-    # sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
-    # sac_process = SACProcess(sac_path)
+    sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
+    sac_process = SACProcess(sac_path)
     # stations = [
     #     'A002', 'A003', 'A004', 'A007', 'A008', 'A009', 'A010', 'A013', 'A014',
     #     'A015', 'A016', 'A020', 'A024', 'A025', 'A026', 'A030', 'A032', 'A034',
@@ -213,8 +213,8 @@ if __name__ == '__main__':
     #     'G060', 'G061', 'I002', 'J001'
     # ]
     # date = "20220918"
-    # sac_files = sac_process.readSACFile(date)
-    # file_names = [sac_process.reName(path, os.path.basename(file)) for file in files]
+    sac_files = sac_process.readSACFile(date)
+    file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
 
     # catalogProcess
     # path = "../TSMIP_Dataset"
@@ -230,23 +230,23 @@ if __name__ == '__main__':
     # _ = catalog_process.addMw(path, catalog_name)
 
     # recordProcess
-    record_process = recordProcess()
-    path = "../TSMIP_Dataset"
-    catalog_name = "GDMS_catalog.csv"
-    catalog = pd.read_csv(f"{path}/{catalog_name}")
-    output_name = "GDMS_Record.csv"
+    # record_process = recordProcess()
+    # path = "../TSMIP_Dataset"
+    # catalog_name = "GDMS_catalog.csv"
+    # catalog = pd.read_csv(f"{path}/{catalog_name}")
+    # output_name = "GDMS_Record.csv"
     # sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
     # sac_process = SACProcess(sac_path)
     # file_names = sac_process.readSACFile("0918")
     # record = record_process.getRecordDf(file_names, catalog)
     # _ = record_process.buildRecordFile(record, path+output_name)
 
-    records = pd.read_csv(f"{path}/{output_name}")
-    stations_name = "GDMS_stations.csv"
+    # records = pd.read_csv(f"{path}/{output_name}")
+    # stations_name = "GDMS_stations.csv"
     # stations = pd.read_csv(f"{path}/{stations_name}")
     # result = record_process.getDistance(catalog, records, stations)
     # records["sta_dist"] = result
-    iasp91_P_arrival, iasp91_S_arrival = record_process.getArrivalTime(catalog, records)
-    records["iasp91_P_arrival"] = iasp91_P_arrival
-    records["iasp91_S_arrival"] = iasp91_S_arrival
-    _ = record_process.buildRecordFile(records, path+output_name)
+    # iasp91_P_arrival, iasp91_S_arrival = record_process.getArrivalTime(catalog, records)
+    # records["iasp91_P_arrival"] = iasp91_P_arrival
+    # records["iasp91_S_arrival"] = iasp91_S_arrival
+    # _ = record_process.buildRecordFile(records, path+output_name)

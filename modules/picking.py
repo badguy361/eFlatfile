@@ -123,30 +123,33 @@ class picking():
             for index, sac_file_name in enumerate(sac_file_names[num - 1::]):
                 sta = sac_file_name.split(".")[1]
                 instrument_file_names = self.readInstrumentFile(sta)
+                logger.info(sac_file_name)
                 sac_HLE = sac_file_name
                 sac_HLN = re.sub("HLE", "HLN", sac_file_name)
                 sac_HLZ = re.sub("HLE", "HLZ", sac_file_name)
                 Dist = round(self.getDist(sac_file_name), 2)
                 Mw = self.getMw(sac_file_name)
                 P_arrive , S_arrive = self.getArrivalTime(sac_file_name)
-
+                print(f"{self.instrument_path}/{sta}/{instrument_file_names[0]}")
                 s = f"r {self.sac_path}/{sac_HLZ} \
                     {self.sac_path}/{sac_HLE} \
                     {self.sac_path}/{sac_HLN} \n"
 
-                #instrument response steps
+                # instrument response steps
                 s += "rmean; rtrend \n"
                 s += "taper \n"
-                s += f"trans from polezero s {self.instrument_path}/{sta}/{instrument_file_names[0]} \
-                        to acc freq 0.02 0.1 1 10 \n"
+                # s += f"trans from polezero s {self.instrument_path}/{sta}/{instrument_file_names[0]} \
+                #         to acc freq 0.02 0.1 1 10 \n" #PZs檔
+                s += "trans from evalresp fname RESP.ALL to acc freq 0.02 0.1 1 10 \n" #RESP檔
+                # s += "mul 2.45E-6 \n" # 乘常數
 
                 s += "qdp of \n"
                 #auto picking
-                s += f"ch t1 {P_arrive} t2 {S_arrive} \n"
-                s += "p1 \n"
+                s += f"ch t5 {P_arrive} t6 {S_arrive} \n"
+                # s += "p1 \n"
                 s += f"title DIST={Dist}_Mw={Mw} Location BOTTOM size large \n"
                 s += "ppk m \n"
-                s += "w over \n"
+                # s += "w over \n"
                 s += "q \n"
                 subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
                     s.encode())  # show the interactivate window
@@ -157,10 +160,10 @@ class picking():
                 # print(type(sac1.data[1]))
                 # print(sac1.reftime)
 
-                self.inputResult(sac_file_name, sac1, sac2, sacZ)
-                if self.zory != '':
-                    self.sacToAsc(sac_file_name, sac1, sac2, sacZ, self.zory)
-                logger.info(self.result)
+                # self.inputResult(sac_file_name, sac1, sac2, sacZ)
+                # if self.zory != '':
+                #     self.sacToAsc(sac_file_name, sac1, sac2, sacZ, self.zory)
+                # logger.info(self.result)
 
         finally: # 確保臨時中斷也能輸出
             df = pd.DataFrame.from_dict(self.result,orient='index')
@@ -173,7 +176,7 @@ class picking():
 if __name__ == '__main__':
     year = "2021"
     mon = "05"
-    num = 2
+    num = 1
     sac_path = f"../TSMIP_Dataset/GuanshanChishangeq/rowdata"
     asc_path = f"../TSMIP_Dataset/picking_result"
     instrument_path = f"../TSMIP_Dataset/InstrumentResponse"
