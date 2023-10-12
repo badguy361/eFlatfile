@@ -11,15 +11,40 @@ import subprocess
 
 class SACProcess():
 
-    def __init__(self, sac_path):
+    def __init__(self, sac_path, instrument_path):
         os.putenv("SAC_DISPLAY_COPYRIGHT", "0")
         self.sac_path = sac_path
+        self.instrument_path = instrument_path
 
-    def readSACFile(self, date):
-        total_files = glob.glob(f"{self.sac_path}/*HLE*{date}*.SAC")
+    def readSACFile(self, read_all=False):
+        if read_all == True:
+            total_files = glob.glob(f"{self.sac_path}/*HLE*.SAC")
+        else:
+            total_files = glob.glob(f"{self.sac_path}/*.SAC")
+
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
     
+    def readInstrumentFile(self, sta):
+        """
+            Output: ['SAC_PZs_TW_A002_HLE_10_2019.051.00.00.00.0000_2599.365.23.59.59.99999',..]
+        """
+        total_files = glob.glob(f"{self.instrument_path}/{sta}/*All*.99999")
+        file_names = [os.path.basename(_) for _ in total_files]
+        return file_names
+    
+    def removeInstrumentResponse(self, sac_file):
+        
+        # instrument response steps
+        s += "rmean; rtrend \n"
+        s += "taper \n"
+        s += f"trans from polezero s TSMIP.PZs_All.99999 \
+                to acc freq 0.02 0.1 1 10 \n"
+        # s += "mul 2.45E-6 \n" # 乘常數
+        s += "w over \n"
+        subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
+                    s.encode())
+
     def reName(self, path, file_name):
         """
             revised formated
@@ -164,7 +189,37 @@ if __name__ == '__main__':
 
     # SACProcess
     sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
-    sac_process = SACProcess(sac_path)
+    instrument_path = f"../TSMIP_Dataset/InstrumentResponse"
+    sac_process = SACProcess(sac_path, instrument_path)
+    
+    sac_files = sac_process.readSACFile(read_all=True)
+    file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
+
+    # catalogProcess
+    # path = "../TSMIP_Dataset"
+    # catalog_name = "GDMS_catalog.csv"
+    # catalog = pd.read_csv(f"{path}/{catalog_name}")
+    # catalog_process = catalogProcess(catalog)
+    # new_datetime = []
+    # for i in range(catalog.__len__()):
+    #     new_datetime.append(
+    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
+    #                                         catalog['time'][i]))
+    # _ = catalog_process.addTaiwanTime(path, new_datetime, catalog_name)
+    # _ = catalog_process.addMw(path, catalog_name)
+
+    # recordProcess
+    # record_process = recordProcess()
+    # path = "../TSMIP_Dataset"
+    # catalog_name = "GDMS_catalog.csv"
+    # catalog = pd.read_csv(f"{path}/{catalog_name}")
+    # output_name = "GDMS_Record.csv"
+    # sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
+    # sac_process = SACProcess(sac_path)
+    # file_names = sac_process.readSACFile()
+    # record = record_process.getRecordDf(file_names, catalog)
+    # _ = record_process.buildRecordFile(record, path+output_name)
+
     # stations = [
     #     'A002', 'A003', 'A004', 'A007', 'A008', 'A009', 'A010', 'A013', 'A014',
     #     'A015', 'A016', 'A020', 'A024', 'A025', 'A026', 'A030', 'A032', 'A034',
@@ -212,35 +267,6 @@ if __name__ == '__main__':
     #     'G038', 'G041', 'G045', 'G047', 'G048', 'G052', 'G053', 'G055', 'G057',
     #     'G060', 'G061', 'I002', 'J001'
     # ]
-    # date = "20220918"
-    sac_files = sac_process.readSACFile(date)
-    file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
-
-    # catalogProcess
-    # path = "../TSMIP_Dataset"
-    # catalog_name = "GDMS_catalog.csv"
-    # catalog = pd.read_csv(f"{path}/{catalog_name}")
-    # catalog_process = catalogProcess(catalog)
-    # new_datetime = []
-    # for i in range(catalog.__len__()):
-    #     new_datetime.append(
-    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
-    #                                         catalog['time'][i]))
-    # _ = catalog_process.addTaiwanTime(path, new_datetime, catalog_name)
-    # _ = catalog_process.addMw(path, catalog_name)
-
-    # recordProcess
-    # record_process = recordProcess()
-    # path = "../TSMIP_Dataset"
-    # catalog_name = "GDMS_catalog.csv"
-    # catalog = pd.read_csv(f"{path}/{catalog_name}")
-    # output_name = "GDMS_Record.csv"
-    # sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
-    # sac_process = SACProcess(sac_path)
-    # file_names = sac_process.readSACFile("0918")
-    # record = record_process.getRecordDf(file_names, catalog)
-    # _ = record_process.buildRecordFile(record, path+output_name)
-
     # records = pd.read_csv(f"{path}/{output_name}")
     # stations_name = "GDMS_stations.csv"
     # stations = pd.read_csv(f"{path}/{stations_name}")

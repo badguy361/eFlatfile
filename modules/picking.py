@@ -10,11 +10,10 @@ from obspy.io.sac import SACTrace
 
 class picking():
 
-    def __init__(self, sac_path, asc_path, instrument_path, record, catalog):
+    def __init__(self, sac_path, asc_path, record, catalog):
         os.putenv("SAC_DISPLAY_COPYRIGHT", "0")
         self.sac_path = sac_path
         self.asc_path = asc_path
-        self.instrument_path = instrument_path
         self.record = record
         self.catalog = catalog
         self.result = {}
@@ -26,14 +25,6 @@ class picking():
             Output: ['TW.A002.10.HLE.D.20220918144415.SAC', 'TW.A003.10.HLE.D.20220918144415.SAC',...]
         """
         total_files = glob.glob(f"{self.sac_path}/*HLE*.SAC")
-        file_names = [os.path.basename(_) for _ in total_files]
-        return file_names
-
-    def readInstrumentFile(self, sta):
-        """
-            Output: ['SAC_PZs_TW_A002_HLE_10_2019.051.00.00.00.0000_2599.365.23.59.59.99999',..]
-        """
-        total_files = glob.glob(f"{self.instrument_path}/{sta}/*All*.99999")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
     
@@ -121,8 +112,6 @@ class picking():
         """
         try:
             for index, sac_file_name in enumerate(sac_file_names[num - 1::]):
-                sta = sac_file_name.split(".")[1]
-                instrument_file_names = self.readInstrumentFile(sta)
                 logger.info(sac_file_name)
                 sac_HLE = sac_file_name
                 sac_HLN = re.sub("HLE", "HLN", sac_file_name)
@@ -130,18 +119,9 @@ class picking():
                 Dist = round(self.getDist(sac_file_name), 2)
                 Mw = self.getMw(sac_file_name)
                 P_arrive , S_arrive = self.getArrivalTime(sac_file_name)
-                print(f"{self.instrument_path}/{sta}/{instrument_file_names[0]}")
                 s = f"r {self.sac_path}/{sac_HLZ} \
                     {self.sac_path}/{sac_HLE} \
                     {self.sac_path}/{sac_HLN} \n"
-
-                # instrument response steps
-                s += "rmean; rtrend \n"
-                s += "taper \n"
-                # s += f"trans from polezero s {self.instrument_path}/{sta}/{instrument_file_names[0]} \
-                #         to acc freq 0.02 0.1 1 10 \n" #PZs檔
-                s += "trans from evalresp fname RESP.ALL to acc freq 0.02 0.1 1 10 \n" #RESP檔
-                # s += "mul 2.45E-6 \n" # 乘常數
 
                 s += "qdp of \n"
                 #auto picking
@@ -179,7 +159,6 @@ if __name__ == '__main__':
     num = 1
     sac_path = f"../TSMIP_Dataset/GuanshanChishangeq/rowdata"
     asc_path = f"../TSMIP_Dataset/picking_result"
-    instrument_path = f"../TSMIP_Dataset/InstrumentResponse"
 
     path = "../TSMIP_Dataset"
     record_name = "GDMS_Record.csv"
@@ -187,6 +166,6 @@ if __name__ == '__main__':
     records = pd.read_csv(f"{path}/{record_name}")
     catalog = pd.read_csv(f"{path}/{catalog_name}")
 
-    pick = picking(sac_path, asc_path, instrument_path, records, catalog)
+    pick = picking(sac_path, asc_path, records, catalog)
     file_names = pick.readSACFile(year, mon)
     _ = pick.mainProcess(file_names, num)

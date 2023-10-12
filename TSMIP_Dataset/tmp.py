@@ -1,3 +1,3 @@
 from obspy import read
-st = read("./GuanshanChishangeq/rowdata/20220918144415.mseed")
+st = read("./GuanshanChishangeq/rowdata2/0916-0917.mseed")
 print(st.__str__(extended=True))
