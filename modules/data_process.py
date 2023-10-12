@@ -8,6 +8,7 @@ import os
 import glob
 import numpy as np
 import subprocess
+from logger import logger
 
 class SACProcess():
 
@@ -17,35 +18,37 @@ class SACProcess():
         self.instrument_path = instrument_path
 
     def getSACFile(self, get_all=False):
-        if get_all == True:
+        if get_all == False:
             total_files = glob.glob(f"{self.sac_path}/*HLE*.SAC")
         else:
             total_files = glob.glob(f"{self.sac_path}/*.SAC")
-        # file_names = [os.path.basename(_) for _ in total_files]
-        return total_files
+        file_names = [os.path.basename(_) for _ in total_files]
+        return file_names
     
     def getInstrumentFile(self):
         """
             Output: ['SAC_PZs_TW_A002_HLE_10_2019.051.00.00.00.0000_2599.365.23.59.59.99999',..]
         """
-        total_files = glob.glob(f"{self.instrument_path}/All/*All*.99999")
-        return total_files
+        total_files = glob.glob(f"{self.instrument_path}/*All*.99999")
+        file_names = [os.path.basename(_) for _ in total_files]
+        return file_names
     
     def removeInstrumentResponse(self, sac_file_names, instrument_file):
-        for index, sac_file_name in enumerate(sac_file_names):
-            sac_HLE = sac_file_name
-            sac_HLN = re.sub("HLE", "HLN", sac_file_name)
-            sac_HLZ = re.sub("HLE", "HLZ", sac_file_name)
-            s = f"r {self.sac_path}/{sac_HLZ} \
-                {self.sac_path}/{sac_HLE} \
-                {self.sac_path}/{sac_HLN} \n"
+        """
+            To remove instrument response by instrument file. Please don't remove twice !!!
+            Note: check if remove instrument response by header-variables: https://seisman.github.io/SAC_Docs_zh/fileformat/header-variables/
+        """
+        for sac_file_name in sac_file_names:
+            s = f"r {self.sac_path}/{sac_file_name}\n"
             s += "rmean; rtrend \n"
             s += "taper \n"
-            s += f"trans from polezero s {instrument_file}\
+            s += f"trans from polezero s {self.instrument_path}/{instrument_file}\
                     to acc freq 0.02 0.1 1 10 \n"
             s += "w over \n"
+            s += "q \n"
             subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
                         s.encode())
+        logger.info("remove finished.")
 
     def reName(self, path, file_name):
         """
@@ -193,15 +196,14 @@ if __name__ == '__main__':
     sac_path = "../TSMIP_Dataset/GuanshanChishangeq/rowdata"
     instrument_path = f"../TSMIP_Dataset/InstrumentResponse/All"
     sac_process = SACProcess(sac_path, instrument_path)
-    
-    # step:1
+
+    # step-1 remove instrument response
     sac_files = sac_process.getSACFile(get_all=True)
-    file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
-
-    # step:2
     instrument_file = sac_process.getInstrumentFile()
-    sac_process.removeInstrumentResponse(sac_files, instrument_file)
+    sac_process.removeInstrumentResponse(sac_files, instrument_file[0])
 
+    # step-2 rename
+    # file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
 
     # catalogProcess
     # path = "../TSMIP_Dataset"
