@@ -1,21 +1,19 @@
 import requests
-import pandas as pd
 from config import config
 from logger import logger
 import os
 from dotenv import load_dotenv
-import pandas as pd
 import csv
 from bs4 import BeautifulSoup
 import re
-import time
+from urllib.parse import urlsplit
+
 load_dotenv()
 
 # retur = rs.get("https://gdmsn.cwb.gov.tw/eqconDownload.php")
 # cookies = retur.cookies
 # cookie_value = cookies.get('PHPSESSID')
 # print(retur.text)
-
 
 class GDMS():
     """
@@ -118,52 +116,60 @@ class GDMS():
         except:
             logger.error("Get instrument response failed")
 
-    def getDownloadUrl(self, html_file, download_time):
+    def getDownloadPage(self):
         """
-            To get download zip link from html file
-            Input : html file which download from GDMS website
-            Output : download zip link
+            To get download Page
         """
-        with open(html_file, 'r', encoding='utf-8') as file:
-            html_content = file.read()
-        soup = BeautifulSoup(html_content, 'html.parser')
-
-        pattern = re.compile(fr'{download_time}')  #查詢<td>條件
-        td_elements = soup.find_all('td', string=pattern)
-        link_elements = []
-        for td_element in td_elements:
-            try:
-                link_element = td_element.find_next_siblings('td')[1].find(
-                    'a', href=True)['href']  # 取得url
-                link_elements.append(self.api_url + link_element[1:])
-            except:
-                pass
-        return link_elements
-
-    def downloadData(self, download_link, output_name):
-        """
-            To download infomation from download link
-        """
-        response = self.rs.get(download_link)
+        download_url = f"{self.api_url}/php/dbconnect/getMemberDownList.php"
+        response = self.rs.get(download_url)
         if response.status_code == 200:
-            with open(f'{self.output_path}/InstrumentResponse/{output_name}', 'wb') as file:
-                file.write(response.content)
-            logger.info('Download successed')
+            return response.json()
         else:
             logger.info('URL wrong')
 
+    def getDownUrl(self, result, date):
+        """
+            To get download link from download page
+            Input: [{'script': {'zh': '地震 (儀器響應檔)', 'en': 'Seismic (Responds)'},
+                    'datetime': '2023-10-14 16:56:23',
+                    ...
+                    'show_status': '<a href="./userdata/3ef24bbfa8abe4f408a52ad299e582d7/All.tgz" target="_blank">All.tgz</a>'
+                    },
+                    {...},
+                    ]
+            Output: [./userdata/3ef24bbfa8abe4f408a52ad299e582d7/All.tgz, ...]
+        """
+        total_url = []
+        matching_entries = [entry for entry in result if re.match(fr'{date}', entry['datetime'])]
+        for matching_entry in matching_entries:
+            parser = BeautifulSoup(matching_entry['show_status'], 'html.parser')
+            url = parser.find("a").get('href')
+            total_url.append(url)
+        return total_url
+    
+    def autoDownloadData(self, total_url, file_path):
+        """
+            To download data from the download link
+            Input: [./userdata/3ef24bbfa8abe4f408a52ad299e582d7/All.tgz, ...]
+        """
+        for url in total_url:
+            file_name = urlsplit(url).path.split("/")[-1] # To get file name from the url
+            download_link = self.api_url + url[1:]
+            response = requests.get(download_link)
+            with open(file_path+file_name, 'wb') as file:
+                file.write(response.content)
 
 if __name__ == '__main__':
     gdms = GDMS()
     # eq_catalog = gdms.getCatalog()
-    # _ = gdms.catalogToCsv(eq_catalog, '../TSMIP_Dataset/GDMS_catalog.csv')
-
+    # catalog_path = '../TSMIP_Dataset/GDMS_catalog.csv'
+    # _ = gdms.catalogToCsv(eq_catalog, catalog_path)
     # _ = gdms.getWaveform()
-    _ = gdms.getInstrumentResponse()
+    # _ = gdms.getInstrumentResponse()
 
-    # html_file = "download_page.html"
-    # download_time = '2023-10-11 08:'
-    # link_elements = gdms.getDownloadUrl(html_file, download_time)
-    # for index, link_element in enumerate(link_elements):
-    #     _ = gdms.downloadData(link_element, link_elements[index][-8:])
-
+    file_path = "../TSMIP_Dataset/"
+    result = gdms.getDownloadPage()
+    date = '2023-10-14'
+    total_url = gdms.getDownUrl(result, date)
+    _ = gdms.autoDownloadData(total_url, file_path)
+    
