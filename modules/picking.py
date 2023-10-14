@@ -19,7 +19,7 @@ class picking():
         self.result = {}
         self.zory = ''
 
-    def readSACFile(self, year, mon):
+    def getSACFile(self, year, mon):
         """
             Read all SAC file downloaded from TSMIP
             Output: ['TW.A002.10.HLE.D.20220918144415.SAC', 'TW.A003.10.HLE.D.20220918144415.SAC',...]
@@ -45,10 +45,6 @@ class picking():
         Mw = results[results['file_name'] == sac_HLE]["Mw"].values[0]
         return Mw
 
-    def getArrivalTime(self, sac_HLE):
-        P_arrive = self.record[self.record["file_name"] == sac_HLE]["iasp91_P_arrival"].values[0]+120
-        S_arrive = self.record[self.record["file_name"] == sac_HLE]["iasp91_S_arrival"].values[0]+120
-        return P_arrive, S_arrive
 
     def inputResult(self, sac_file_name, sac1, sac2, sacZ):
         """
@@ -112,20 +108,19 @@ class picking():
         """
         try:
             for index, sac_file_name in enumerate(sac_file_names[num - 1::]):
-                logger.info(sac_file_name)
+                logger.info(f"{sac_file_name} {index+num}/{len(sac_file_names)}")
                 sac_HLE = sac_file_name
                 sac_HLN = re.sub("HLE", "HLN", sac_file_name)
                 sac_HLZ = re.sub("HLE", "HLZ", sac_file_name)
                 Dist = round(self.getDist(sac_file_name), 2)
                 Mw = self.getMw(sac_file_name)
-                P_arrive , S_arrive = self.getArrivalTime(sac_file_name)
+                
                 s = f"r {self.sac_path}/{sac_HLZ} \
                     {self.sac_path}/{sac_HLE} \
                     {self.sac_path}/{sac_HLN} \n"
 
                 s += "qdp of \n"
                 #auto picking
-                s += f"ch t5 {P_arrive} t6 {S_arrive} \n"
                 # s += "p1 \n"
                 s += f"title DIST={Dist}_Mw={Mw} Location BOTTOM size large \n"
                 s += "ppk m \n"
@@ -157,7 +152,7 @@ if __name__ == '__main__':
     year = "2021"
     mon = "05"
     num = 1
-    sac_path = f"../TSMIP_Dataset/GuanshanChishangeq/rowdata"
+    sac_path = f"../TSMIP_Dataset/GuanshanChishangeq"
     asc_path = f"../TSMIP_Dataset/picking_result"
 
     path = "../TSMIP_Dataset"
@@ -167,5 +162,5 @@ if __name__ == '__main__':
     catalog = pd.read_csv(f"{path}/{catalog_name}")
 
     pick = picking(sac_path, asc_path, records, catalog)
-    file_names = pick.readSACFile(year, mon)
+    file_names = pick.getSACFile(year, mon)
     _ = pick.mainProcess(file_names, num)

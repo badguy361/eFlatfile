@@ -68,6 +68,34 @@ class SACProcess():
         os.rename(f"{path}/{file_name}", f"{path}/{new_file_name}")
         return new_file_name
 
+    def _getArrivalTime(self, records ,sac_HLE):
+        """
+            To get arrival time from record
+        """
+        P_arrive = records[records["file_name"] == sac_HLE]["iasp91_P_arrival"].values[0]+120
+        S_arrive = records[records["file_name"] == sac_HLE]["iasp91_S_arrival"].values[0]+120
+        return P_arrive, S_arrive
+    
+    def autoPick(self, records, sac_file_names):
+        """
+            To pick the p and s wave by record data
+        """
+        for sac_file_name in sac_file_names:
+            sac_HLE = sac_file_name
+            sac_HLN = re.sub("HLE", "HLN", sac_file_name)
+            sac_HLZ = re.sub("HLE", "HLZ", sac_file_name)
+            P_arrive , S_arrive = self._getArrivalTime(records ,sac_file_name)
+
+            s = f"r {self.sac_path}/{sac_HLZ} \
+                {self.sac_path}/{sac_HLE} \
+                {self.sac_path}/{sac_HLN} \n"
+            s += f"ch t1 {P_arrive} t2 {S_arrive} \n"
+            s += "p1 \n"
+            s += "w over \n"
+            s += "q \n"
+            subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
+                        s.encode())
+        logger.info("auto pick finished.")
 
 class catalogProcess():
 
@@ -178,12 +206,12 @@ if __name__ == '__main__':
     instrument_path = f"../TSMIP_Dataset/InstrumentResponse/All"
     sac_process = SACProcess(sac_path, instrument_path)
 
-    # step-1 remove instrument response
+    #? step-1 remove instrument response
     # sac_files = sac_process.getSACFile(get_all=True)
     # instrument_file = sac_process.getInstrumentFile()
     # sac_process.removeInstrumentResponse(sac_files, instrument_file[0])
 
-    # step-2 rename
+    #? step-2 rename
     # file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
 
     #! recordProcess
@@ -193,22 +221,27 @@ if __name__ == '__main__':
     catalog = pd.read_csv(catalog_path)
     record_process = recordProcess(catalog, stations)
     
-    # step-3 build record csv
+    #? step-3 build record csv
     record_path = "../TSMIP_Dataset/GDMS_Record.csv"
     # sac_files = sac_process.getSACFile(get_all=False)
     # record = record_process.getRecordDf(sac_files)
     # _ = record_process.buildRecordFile(record, record_path)
 
-    # step-4 merge Distance
+    #? step-4 merge Distance
     # records = pd.read_csv(record_path)
     # result = record_process.getDistance(records)
     # records["sta_dist"] = result
 
-    # step-5 merge P S arrival
+    #? step-5 merge P S arrival
     # iasp91_P_arrival, iasp91_S_arrival = record_process.getArrivalTime(records)
     # records["iasp91_P_arrival"] = iasp91_P_arrival
     # records["iasp91_S_arrival"] = iasp91_S_arrival
     # _ = record_process.buildRecordFile(records, record_path)
+
+    #? step-6 auto pick
+    records = pd.read_csv(record_path)
+    sac_files = sac_process.getSACFile(get_all=False)
+    sac_process.autoPick(records, sac_files)
 
     #! catalogProcess
     # catalog_process = catalogProcess(catalog, catalog_path)
