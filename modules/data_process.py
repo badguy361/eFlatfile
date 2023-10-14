@@ -71,7 +71,8 @@ class SACProcess():
 
 class catalogProcess():
 
-    def __init__(self, catalog):
+    def __init__(self, catalog, catalog_path):
+        self.catalog_path = catalog_path
         self.catalog = catalog
     
     def GMTtoTaiwanTime(self, date, time):
@@ -88,56 +89,26 @@ class catalogProcess():
         new_datetime = new_datetime.strftime('%Y%m%d%H%M%S')
         return new_datetime
 
-    def addTaiwanTime(self, path, new_datetime, catalog_name):
+    def addTaiwanTime(self, new_datetime):
         """
             Add GMT+8 Taiwan time to catalog
         """
         self.catalog["taiwan_time"] = new_datetime
-        self.catalog.to_csv(f'{path}/{catalog_name}', index=False)
+        self.catalog.to_csv(self.catalog_path, index=False)
 
-    def addMw(self, path, catalog_name):
+    def addMw(self):
+        """
+            Add Mw to catalog which calculate by formula
+            ML≤6.0  ->  ML = 0.961Mw+0.338±0.256
+            ML≥5.5  ->  ML = 5.115 ln(Mw)-3.131±0.379
+            鄭世楠等(2010)所建立之芮氏規模與震矩規模轉換關係式進行轉換
+        """
         self.catalog["Mw"] = np.where(
             self.catalog["ML"] > 6.0,
             np.exp((self.catalog["ML"] + 3.131) / 5.115),
             (self.catalog["ML"] - 0.338) / 0.961)
         self.catalog["Mw"] = round(self.catalog["Mw"], 2)
-        self.catalog.to_csv(f'{path}/{catalog_name}', index=False)
-        #M_L = 0.961M_w+0.338±0.256 (M_L≤6.0)
-        #M_L = 5.115 ln⁡(M_w )-3.131±0.379 (M_L≥5.5)
-        #鄭世楠等(2010)所建立之芮氏規模與震矩規模轉換關係式進行轉換
-
-    def getArrivalTime(self, catlog, model_name='iasp91'):
-        iasp91_P_arrival = []
-        iasp91_S_arrival = []
-        for i in tqdm(range(catlog.shape[0])):
-            try:
-                model = TauPyModel(
-                    model=model_name)  #ak135 prem jb pwdk can test
-                dist = kilometer2degrees(catlog["dist_surface"][i])
-                depth = catlog["origins.depth"][i] / 1000
-                arrivals = model.get_travel_times\
-                    (source_depth_in_km=depth, distance_in_degree=dist,\
-                    phase_list=["P","S",'p','s'])
-                iasp91_P_arrival.append(arrivals[0].time)
-                iasp91_S_arrival.append(arrivals[-1].time)
-            except:
-                iasp91_P_arrival.append("NA")
-                iasp91_S_arrival.append("NA")
-
-        return iasp91_P_arrival, iasp91_S_arrival
-
-    # def updateCatalog(self, catalog, iasp91_P_arrival, iasp91_S_arrival):
-    #     catlog["iasp91_P_arrival"] = iasp91_P_arrival
-    #     catlog["iasp91_S_arrival"] = iasp91_S_arrival
-    #     catlog.to_csv("D:/緬甸BH/merge_event_eq(add_cut_2021).csv",
-    #                   index=False,
-    #                   mode='w')
-
-    # def mergeTime(self):
-    #     new_date = self.catalog['date'].str.replace("/", "")
-    #     new_time = self.catalog['time'].str.replace(":", "")
-    #     new_eqtime = new_date + new_time
-    #     return new_eqtime
+        self.catalog.to_csv(self.catalog_path, index=False)
 
 
 class recordProcess():
@@ -229,25 +200,22 @@ if __name__ == '__main__':
     # _ = record_process.buildRecordFile(record, record_path)
 
     # step-4 merge Distance
-    records = pd.read_csv(record_path)
-    result = record_process.getDistance(records)
-    records["sta_dist"] = result
+    # records = pd.read_csv(record_path)
+    # result = record_process.getDistance(records)
+    # records["sta_dist"] = result
 
     # step-5 merge P S arrival
-    iasp91_P_arrival, iasp91_S_arrival = record_process.getArrivalTime(records)
-    records["iasp91_P_arrival"] = iasp91_P_arrival
-    records["iasp91_S_arrival"] = iasp91_S_arrival
-    _ = record_process.buildRecordFile(records, record_path)
+    # iasp91_P_arrival, iasp91_S_arrival = record_process.getArrivalTime(records)
+    # records["iasp91_P_arrival"] = iasp91_P_arrival
+    # records["iasp91_S_arrival"] = iasp91_S_arrival
+    # _ = record_process.buildRecordFile(records, record_path)
 
-    # catalogProcess
-    # path = "../TSMIP_Dataset"
-    # catalog_name = "GDMS_catalog.csv"
-    # catalog = pd.read_csv(f"{path}/{catalog_name}")
-    # catalog_process = catalogProcess(catalog)
+    #! catalogProcess
+    # catalog_process = catalogProcess(catalog, catalog_path)
     # new_datetime = []
     # for i in range(catalog.__len__()):
     #     new_datetime.append(
     #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
     #                                         catalog['time'][i]))
-    # _ = catalog_process.addTaiwanTime(path, new_datetime, catalog_name)
-    # _ = catalog_process.addMw(path, catalog_name)
+    # _ = catalog_process.addTaiwanTime(new_datetime)
+    # _ = catalog_process.addMw()
