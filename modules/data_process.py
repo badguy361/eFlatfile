@@ -36,6 +36,7 @@ class SACProcess():
     def removeInstrumentResponse(self, sac_file_names, instrument_file):
         """
             To remove instrument response by instrument file. Please don't remove twice !!!
+            The steps are from GDMS website: https://gdms.cwa.gov.tw/help.php
             Note: check if remove instrument response by header-variables: https://seisman.github.io/SAC_Docs_zh/fileformat/header-variables/
         """
         for sac_file_name in sac_file_names:

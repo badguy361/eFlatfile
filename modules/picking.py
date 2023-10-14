@@ -24,7 +24,7 @@ class picking():
             Read all SAC file downloaded from TSMIP
             Output: ['TW.A002.10.HLE.D.20220918144415.SAC', 'TW.A003.10.HLE.D.20220918144415.SAC',...]
         """
-        total_files = glob.glob(f"{self.sac_path}/*HLE*.SAC")
+        total_files = glob.glob(f"{self.sac_path}/*HLE*{year}{mon}*.SAC")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
     
@@ -44,7 +44,6 @@ class picking():
                            how='inner')
         Mw = results[results['file_name'] == sac_HLE]["Mw"].values[0]
         return Mw
-
 
     def inputResult(self, sac_file_name, sac1, sac2, sacZ):
         """
@@ -100,11 +99,7 @@ class picking():
     def mainProcess(self, sac_file_names, num):
         """
             To open file through SAC package ppk mode
-            
-            The remove instrument response steps are from CWA website
-            ref: https://gdms.cwa.gov.tw/help.php
             Input : sac_file_names= ['TW.A002.10.HLE.D.20220918144415.SAC', ...]
-                    instrument_file_names= ['SAC_PZs_TW_A002_HLE_10_2019.051.00.00.00.0000_2599.365.23.59.59.99999', ...]
         """
         try:
             for index, sac_file_name in enumerate(sac_file_names[num - 1::]):
@@ -118,13 +113,11 @@ class picking():
                 s = f"r {self.sac_path}/{sac_HLZ} \
                     {self.sac_path}/{sac_HLE} \
                     {self.sac_path}/{sac_HLN} \n"
-
                 s += "qdp of \n"
-                #auto picking
-                # s += "p1 \n"
+                s += "p1 \n"
                 s += f"title DIST={Dist}_Mw={Mw} Location BOTTOM size large \n"
                 s += "ppk m \n"
-                # s += "w over \n"
+                s += "w over \n"
                 s += "q \n"
                 subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
                     s.encode())  # show the interactivate window
@@ -140,7 +133,7 @@ class picking():
                 #     self.sacToAsc(sac_file_name, sac1, sac2, sacZ, self.zory)
                 # logger.info(self.result)
 
-        finally: # 確保臨時中斷也能輸出
+        finally:
             df = pd.DataFrame.from_dict(self.result,orient='index')
             # 轉成csv並加在原有的後面
             df.to_csv(f"{self.asc_path}/result.csv",header=False,index=True,mode='a') 
@@ -149,17 +142,15 @@ class picking():
             logger.info("finish output!!")
 
 if __name__ == '__main__':
-    year = "2021"
-    mon = "05"
+    year = "2022"
+    mon = "09"
     num = 1
     sac_path = f"../TSMIP_Dataset/GuanshanChishangeq"
     asc_path = f"../TSMIP_Dataset/picking_result"
-
-    path = "../TSMIP_Dataset"
-    record_name = "GDMS_Record.csv"
-    catalog_name = "GDMS_catalog.csv"
-    records = pd.read_csv(f"{path}/{record_name}")
-    catalog = pd.read_csv(f"{path}/{catalog_name}")
+    record_path = "../TSMIP_Dataset/GDMS_Record.csv"
+    catalog_path = "../TSMIP_Dataset/GDMS_catalog.csv"
+    records = pd.read_csv(record_path)
+    catalog = pd.read_csv(catalog_path)
 
     pick = picking(sac_path, asc_path, records, catalog)
     file_names = pick.getSACFile(year, mon)
