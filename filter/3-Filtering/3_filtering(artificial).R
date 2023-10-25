@@ -4,8 +4,8 @@ library(foreign)
 library(digest)
 library(Cairo)
 library(stringr)
-library(RCTC)  # New! for calculating RotD50???...
 library(RSEIS) # New! for applying "rsspec.taper()"
+library(RCTC)  # New! for calculating RotD50???...
 ###
 ### LOAD Functions
 ###
@@ -28,10 +28,6 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   ## 1. Phase 1 (Vol. 1; type == 1) data may need instrument correction
   ## 2. Need better error checking and handling in 'spectraw'
   ##
-  
-  #  con <- dbConnect(dbDriver("MySQL"), host=mysql.ip, username=mysql.username, password=mysql.password, dbname=mysql.dbname)
-  #  data.info <- dbGetQuery(con, paste("SELECT * FROM  SGM_INDEX_NEW WHERE file_id = ",paste("'",file.id,"'",sep="")))
-  #  dbDisconnect(con)  #??????è³????åº???????
   
   #rpage = url(data.info$url,'r')
   
@@ -476,13 +472,13 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     ### for running RCTC 
     if(i ==2){
       NS <- c(dt,acc.flt) #è¼¸å…¥æ¿¾å?Œæ³¢å¾Œç?„æ±?±
-      write.table(NS,file=paste0("D:/Myanmar/filter/5-Filtering/Tmp_save_file/NS.txt"),col.names = FALSE,row.names = FALSE)
+      write.table(NS,file=paste0("Tmp_save_file/NS.txt"),col.names = FALSE,row.names = FALSE)
     } else if (i==3) {
       EW <- c(dt,acc.flt)
-      write.table(EW,file=paste0("D:/Myanmar/filter/5-Filtering/Tmp_save_file/EW.txt"),col.names = FALSE,row.names = FALSE)
+      write.table(EW,file=paste0("Tmp_save_file/EW.txt"),col.names = FALSE,row.names = FALSE)
     }
-    nametransfer(filedir1 = paste0("D:/Myanmar/filter/5-Filtering/Tmp_save_file/NS.txt"), filedir2 =paste0("D:/Myanmar/filter/5-Filtering/Tmp_save_file/EW.txt"), stationname = SGM_SN , sn = SGM_ID,
-                outputdir = 'D:/Myanmar/filter/5-Filtering/Tmp_save_file/Inputdata')
+    nametransfer(filedir1 = paste0("Tmp_save_file/NS.txt"), filedir2 =paste0("Tmp_save_file/EW.txt"), stationname = SGM_SN , sn = SGM_ID,
+                outputdir = 'Tmp_save_file/Inputdata')
                 #å¾—åˆ°RoTD50??„è?‡æ??
   }  #end of loop 3 component
   

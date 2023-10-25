@@ -8,6 +8,10 @@ InstrumentResponse
 *.html
 *.7z
 *.xlsx
+*.png
+*.pdf
+*H1
+*H2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
