@@ -139,7 +139,6 @@ class catalogProcess():
         self.catalog["Mw"] = round(self.catalog["Mw"], 2)
         self.catalog.to_csv(self.catalog_path, index=False)
 
-
 class recordProcess():
 
     def __init__(self, catalog, stations):
@@ -202,17 +201,28 @@ class recordProcess():
 
 if __name__ == '__main__':
 
+    #! catalogProcess
+    #? step-1 build catalog
+    # catalog_process = catalogProcess(catalog, catalog_path)
+    # new_datetime = []
+    # for i in range(catalog.__len__()):
+    #     new_datetime.append(
+    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
+    #                                         catalog['time'][i]))
+    # _ = catalog_process.addTaiwanTime(new_datetime)
+    # _ = catalog_process.addMw()
+
     #! SACProcess
     sac_path = "../TSMIP_Dataset/GuanshanChishangeq"
     instrument_path = f"../TSMIP_Dataset/InstrumentResponse/All"
     sac_process = SACProcess(sac_path, instrument_path)
 
-    #? step-1 remove instrument response
+    #? step-2 remove instrument response
     # sac_files = sac_process.getSACFile(get_all=True)
     # instrument_file = sac_process.getInstrumentFile()
     # sac_process.removeInstrumentResponse(sac_files, instrument_file[0])
 
-    #? step-2 rename
+    #? step-3 rename
     # file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
 
     #! recordProcess
@@ -222,34 +232,25 @@ if __name__ == '__main__':
     catalog = pd.read_csv(catalog_path)
     record_process = recordProcess(catalog, stations)
     
-    #? step-3 build record csv
+    #? step-4 build record csv
     record_path = "../TSMIP_Dataset/GDMS_Record.csv"
     # sac_files = sac_process.getSACFile(get_all=False)
     # record = record_process.getRecordDf(sac_files)
     # _ = record_process.buildRecordFile(record, record_path)
 
-    #? step-4 merge Distance
+    #? step-5 merge Distance
     # records = pd.read_csv(record_path)
     # result = record_process.getDistance(records)
     # records["sta_dist"] = result
 
-    #? step-5 merge P S arrival
+    #? step-6 merge P S arrival
     # iasp91_P_arrival, iasp91_S_arrival = record_process.getArrivalTime(records)
     # records["iasp91_P_arrival"] = iasp91_P_arrival
     # records["iasp91_S_arrival"] = iasp91_S_arrival
     # _ = record_process.buildRecordFile(records, record_path)
 
-    #? step-6 auto pick
+    #? step-7 auto pick
     records = pd.read_csv(record_path)
     sac_files = sac_process.getSACFile(get_all=False)
     sac_process.autoPick(records, sac_files)
 
-    #! catalogProcess
-    # catalog_process = catalogProcess(catalog, catalog_path)
-    # new_datetime = []
-    # for i in range(catalog.__len__()):
-    #     new_datetime.append(
-    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
-    #                                         catalog['time'][i]))
-    # _ = catalog_process.addTaiwanTime(new_datetime)
-    # _ = catalog_process.addMw()
