@@ -1,8 +1,5 @@
 # 2021.07.28 BH filter
 ###
-library(DBI)
-library(RMySQL)
-library(RMySQL)
 library(foreign)
 library(digest)
 library(Cairo)
@@ -12,7 +9,7 @@ library(RSEIS) # New! for applying "rsspec.taper()"
 ###
 ### LOAD Functions
 ###
-setwd("D:/Myanmar/filter/3-Filtering/")
+setwd("E:/Yu/eFlatfile/filter/3-Filtering/")
 source("SGM_Process/Function_Integrate2VD.r")    
 source("SGM_Process/Function_Integrate_Ia.r")   
 source("SGM_Process/Function_spectraw3.r")    
@@ -51,7 +48,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   # nPole=2.5
   
   data.info  <- filter.frame[filter.frame$filter.id==filter.ID,]
-  rpage <- as.character(paste0("D:/Myanmar/filter/@ts data/output_final/2021/",str_pad(data.info$Month,2, pad = "0"),"/",data.info$Pfile)) 
+  rpage <- as.character(paste0("../../TSMIP_Dataset/picking_result/09/",str_pad(data.info$Month,2, pad = "0"),"/",data.info$Pfile)) 
   accs  <- read.table(rpage, skip=1, col.names=c("time","Z","H1","H2"))
   
   dt <- accs$time[2]-accs$time[1]
@@ -579,7 +576,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   dev.off()
 }
 
-filter.frame <- read.csv(file="D:/Myanmar/filter/3-Filtering/sgm.2021_Frv_Fnm.rec_Rrup.csv",sep=",",header = TRUE,stringsAsFactors = FALSE)
+filter.frame <- read.csv(file="sgm.2021_Frv_Fnm.rec_Rrup.csv",sep=",",header = TRUE,stringsAsFactors = FALSE)
 for (i in 1:14){
   if (i < 10){
     filter.ID= paste0("B00000",i)
