@@ -1,5 +1,6 @@
 # api_url for GDMS
-api_url: https://gdms.cwa.gov.tw
+GDMS_api_url: https://gdms.cwa.gov.tw
+GCMT_api_url: https://www.ldeo.columbia.edu/~gcmt/projects/CMT/catalog/NEW_MONTHLY
 download_path: E:\\Yu\\eFlatfile\\TSMIP_Dataset
 
 # log_level ERROR > WARNING > INFO > DEBUG

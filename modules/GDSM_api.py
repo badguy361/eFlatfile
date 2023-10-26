@@ -24,7 +24,7 @@ class GDMS():
         """
             Initialize the GDMS instance.
         """
-        self.api_url = config.get("api_url")
+        self.api_url = config.get("GDMS_api_url")
         self.output_path = config.get("download_path")
         self._login()
 
