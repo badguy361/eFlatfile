@@ -86,10 +86,13 @@ class GDMS():
         except:
             logger.error("Get waveform failed")
 
-    def catalogToCsv(self, list_data, csv_output_name):
+    def catalogToCsv(self, json_data, csv_output_name):
         """
             Transform CWB json catalog to csv file
-            Input: list record
+            Input: [{'event_id': 101072,
+                    'date': '2018-01-31',
+                    'time': '23:59:44.49',...
+                    },...]
             Output: csv file
         """
         columns = ['event_id', 'date', 'time', 'ms', 'latitude', 'longitude', 'depth', 'ML',\
@@ -97,7 +100,7 @@ class GDMS():
         with open(csv_output_name, mode='w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=columns)
             writer.writeheader()
-            for row in list_data:
+            for row in json_data:
                 writer.writerow(row)
 
     def getInstrumentResponse(self):
@@ -161,15 +164,15 @@ class GDMS():
 
 if __name__ == '__main__':
     gdms = GDMS()
-    # eq_catalog = gdms.getCatalog()
+    eq_catalog = gdms.getCatalog()
     # catalog_path = '../TSMIP_Dataset/GDMS_catalog.csv'
     # _ = gdms.catalogToCsv(eq_catalog, catalog_path)
     # _ = gdms.getWaveform()
     # _ = gdms.getInstrumentResponse()
 
-    file_path = "../TSMIP_Dataset/"
-    result = gdms.getDownloadPage()
-    date = '2023-10-14'
-    total_url = gdms.getDownUrl(result, date)
-    _ = gdms.autoDownloadData(total_url, file_path)
+    # file_path = "../TSMIP_Dataset/"
+    # result = gdms.getDownloadPage()
+    # date = '2023-10-14'
+    # total_url = gdms.getDownUrl(result, date)
+    # _ = gdms.autoDownloadData(total_url, file_path)
     
