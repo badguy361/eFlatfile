@@ -1,11 +1,49 @@
 # api_url for GDMS
 GDMS_api_url: https://gdms.cwa.gov.tw
-GCMT_api_url: https://www.ldeo.columbia.edu/~gcmt/projects/CMT/catalog/NEW_MONTHLY
+GCMT_api_url: https://www.globalcmt.org
 download_path: E:\\Yu\\eFlatfile\\TSMIP_Dataset
 
 # log_level ERROR > WARNING > INFO > DEBUG
 log_level: DEBUG
 
+# yr mo day 起始年月日
+# oyr omo oday 結束年月日
+# llat ulat llon ulon lhd uhd 經緯深範圍
+# 其餘參數參閱 https://www.globalcmt.org/CMTsearch.html
+gcmt_catalog_range: {
+    "itype": "ymd",
+    "yr": "2022",
+    "mo": "1",
+    "day": "1",
+    "otype": "ymd",
+    "oyr": "2022",
+    "omo": "12",
+    "oday": "30",
+    "jyr": "1976",
+    "jday": "1",
+    "ojyr": "1976",
+    "ojday": "1",
+    "nday": "1",
+    "lmw": "0",
+    "umw": "10",
+    "lms": "0",
+    "ums": "10",
+    "lmb": "0",
+    "umb": "10",
+    "llat": "21.5",
+    "ulat": "26",
+    "llon": "119",
+    "ulon": "123",
+    "lhd": "0",
+    "uhd": "1000",
+    "lts": "-9999",
+    "uts": "9999",
+    "lpe1": "0",
+    "upe1": "90",
+    "lpe2": "0",
+    "upe2": "90",
+    "list": "0"
+}
 eq_condition: {
     "output": 'multi-mseed',
     "network": 'TSMIP',
