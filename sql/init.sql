@@ -55,6 +55,6 @@ CREATE TABLE waveform_picking (
     s_arrival_T2 Float,
     filter_id VARCHAR(50),
 
-    FOREIGN KEY (event_id) REFERENCES eq_catalog(event_id)
+    FOREIGN KEY (event_id) REFERENCES eq_catalog(event_id),
     FOREIGN KEY (station) REFERENCES station_infomation(station)
 )
