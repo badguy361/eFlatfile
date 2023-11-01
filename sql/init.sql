@@ -24,7 +24,7 @@ CREATE TABLE gdms_catalog (
 );
 
 CREATE TABLE gcmt_catalog (
-    id int NOT NULL AUTO_INCREMENT,
+    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     date date,
     centroid_time time,
     lat Float,
