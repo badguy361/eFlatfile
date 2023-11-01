@@ -23,22 +23,6 @@ CREATE TABLE eq_catalog (
     quality VARCHAR(1)
 );
 
-CREATE TABLE waveform_picking (
-    event_id VARCHAR(50),
-    file_name VARCHAR(50) PRIMARY KEY,
-    station VARCHAR(10),
-    sta_dist Float,
-    save VARCHAR(1),
-    start_time_T4 Float,
-    end_time_T3 Float,
-    p_arrival_T1 Float,
-    s_arrival_T2 Float,
-    filter_id VARCHAR(50),
-
-    FOREIGN KEY (event_id) REFERENCES eq_catalog(event_id)
-    FOREIGN KEY (station) REFERENCES station_infomation(station)
-)
-
 CREATE TABLE station_infomation (
     station VARCHAR(10) PRIMARY KEY,
     code VARCHAR(20),
@@ -57,4 +41,20 @@ CREATE TABLE station_infomation (
     Z1.0_measure_method VARCHAR(8),
     Kappa Float,
     Kappa_measure_method VARCHAR(10)
+);
+
+CREATE TABLE waveform_picking (
+    event_id VARCHAR(50),
+    file_name VARCHAR(50) PRIMARY KEY,
+    station VARCHAR(10),
+    sta_dist Float,
+    save VARCHAR(1),
+    start_time_T4 Float,
+    end_time_T3 Float,
+    p_arrival_T1 Float,
+    s_arrival_T2 Float,
+    filter_id VARCHAR(50),
+
+    FOREIGN KEY (event_id) REFERENCES eq_catalog(event_id)
+    FOREIGN KEY (station) REFERENCES station_infomation(station)
 )
