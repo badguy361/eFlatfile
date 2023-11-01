@@ -119,7 +119,7 @@ class GCMT():
             date_match = re.search(r"Date:\s*(\d{4}/\s*\d{1,2}/\s*\d{1,2})",
                                    i.text)
             centroid_time_match = re.search(
-                r"Centroid Time:\s*(\d{1,2}:\d{2}:\d{2})", i.text)
+                r'(\d+:\s?\d+:\s?\d+(\.\d+)?)', i.text)
             lat_match = re.search(r"Lat=\s*([-\d\.]+)", i.text)
             lon_match = re.search(r"Lon=\s*([-\d\.]+)", i.text)
             depth_match = re.search(r"Depth=\s*([\d\.]+)", i.text)

@@ -139,6 +139,7 @@ class catalogProcess():
         self.catalog["Mw"] = round(self.catalog["Mw"], 2)
         self.catalog.to_csv(self.catalog_path, index=False)
 
+
 class recordProcess():
 
     def __init__(self, catalog, stations):
@@ -202,15 +203,17 @@ class recordProcess():
 if __name__ == '__main__':
 
     #! catalogProcess
-    #? step-1 build catalog
-    # catalog_process = catalogProcess(catalog, catalog_path)
-    # new_datetime = []
-    # for i in range(catalog.__len__()):
-    #     new_datetime.append(
-    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
-    #                                         catalog['time'][i]))
-    # _ = catalog_process.addTaiwanTime(new_datetime)
-    # _ = catalog_process.addMw()
+    #? step-1 build catalog    
+    catalog_path = "../TSMIP_Dataset/GDMS_catalog.csv"
+    catalog = pd.read_csv(catalog_path)
+    catalog_process = catalogProcess(catalog, catalog_path)
+    new_datetime = []
+    for i in range(catalog.__len__()):
+        new_datetime.append(
+            catalog_process.GMTtoTaiwanTime(catalog['date'][i],
+                                            catalog['time'][i]))
+    _ = catalog_process.addTaiwanTime(new_datetime)
+    _ = catalog_process.addMw()
 
     #! SACProcess
     sac_path = "../TSMIP_Dataset/GuanshanChishangeq"
@@ -226,10 +229,8 @@ if __name__ == '__main__':
     # file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
 
     #! recordProcess
-    catalog_path = "../TSMIP_Dataset/GDMS_catalog.csv"
     stations_path = "../TSMIP_Dataset/GDMS_stations.csv"
     stations = pd.read_csv(stations_path)
-    catalog = pd.read_csv(catalog_path)
     record_process = recordProcess(catalog, stations)
     
     #? step-4 build record csv
@@ -251,6 +252,6 @@ if __name__ == '__main__':
 
     #? step-7 auto pick
     records = pd.read_csv(record_path)
-    sac_files = sac_process.getSACFile(get_all=False)
-    sac_process.autoPick(records, sac_files)
+    # sac_files = sac_process.getSACFile(get_all=False)
+    # sac_process.autoPick(records, sac_files)
 

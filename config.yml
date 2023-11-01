@@ -12,7 +12,7 @@ log_level: DEBUG
 # 其餘參數參閱 https://www.globalcmt.org/CMTsearch.html
 gcmt_catalog_range: {
     "itype": "ymd",
-    "yr": "2020",
+    "yr": "2014",
     "mo": "1",
     "day": "1",
     "otype": "ymd",
