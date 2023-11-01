@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS TSMIP;
 USE TSMIP;
 
-CREATE TABLE eq_catalog (
+CREATE TABLE gdms_catalog (
     event_id VARCHAR(50) PRIMARY KEY,
     date date,
     time time,
@@ -12,15 +12,36 @@ CREATE TABLE eq_catalog (
     eq_depth Float,
     ML Float,
     Mw Float,
-    nstn INT(5),
+    nstn INT,
     dmin Float,
-    gap INT(5),
+    gap INT,
     trms Float,
     ERH Float,
     ERZ Float,
     fixed VARCHAR(5),
-    nph INT(5),
+    nph INT,
     quality VARCHAR(1)
+);
+
+CREATE TABLE gcmt_catalog (
+    id int NOT NULL AUTO_INCREMENT,
+    date date,
+    centroid_time time,
+    lat Float,
+    lon Float,
+    depth Float,
+    half_duration Float,
+    centroid_time_minus_hypocenter_time Float,
+    mw Float,
+    mb Float,
+    ms Float,
+    scalar_moment VARCHAR(20),
+    strike1 INT,
+    dip1 INT,
+    slip1 INT,
+    strike2 INT,
+    dip2 INT,
+    slip2 INT
 );
 
 CREATE TABLE station_infomation (
