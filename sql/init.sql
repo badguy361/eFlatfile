@@ -37,8 +37,8 @@ CREATE TABLE station_infomation (
     site_classification_by_Vs30 VARCHAR(5),
     Vs30 Float,
     Vs30_model VARCHAR(10),
-    Z1.0 Float,
-    Z1.0_measure_method VARCHAR(8),
+    Z1_0 Float,
+    Z1_0_measure_method VARCHAR(8),
     Kappa Float,
     Kappa_measure_method VARCHAR(10)
 );
