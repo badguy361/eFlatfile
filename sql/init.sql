@@ -2,14 +2,14 @@ CREATE DATABASE IF NOT EXISTS TSMIP;
 USE TSMIP;
 
 CREATE TABLE gdms_catalog (
-    event_id VARCHAR(50) PRIMARY KEY,
+    event_id INT NOT NULL PRIMARY KEY,
     date date,
     time time,
     ms Float,
     taiwan_time bigint(50),
-    eq_lat Float,
-    eq_lon Float,
-    eq_depth Float,
+    lat Float,
+    lon Float,
+    depth Float,
     ML Float,
     Mw Float,
     nstn INT,
@@ -24,17 +24,17 @@ CREATE TABLE gdms_catalog (
 );
 
 CREATE TABLE gcmt_catalog (
-    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     date date,
-    centroid_time time,
+    time time,
     lat Float,
     lon Float,
     depth Float,
     half_duration Float,
     centroid_time_minus_hypocenter_time Float,
-    mw Float,
-    mb Float,
-    ms Float,
+    Mw Float,
+    Mb Float,
+    Ms Float,
     scalar_moment VARCHAR(20),
     strike1 INT,
     dip1 INT,
@@ -65,7 +65,7 @@ CREATE TABLE station_infomation (
 );
 
 CREATE TABLE waveform_picking (
-    event_id VARCHAR(50),
+    event_id INT,
     file_name VARCHAR(50) PRIMARY KEY,
     station VARCHAR(10),
     sta_dist Float,
