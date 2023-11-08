@@ -181,6 +181,15 @@ class recordProcess():
                 iasp91_S_arrival.append("NA")
         return iasp91_P_arrival, iasp91_S_arrival
 
+    def getFocalMechanism(self, records, gcmt_catalog):
+        """
+            To get the GCMT Focal mechanism from merged catalog
+            Input : records = Dataframe records csv
+            Output : the sta_dist column series
+        """
+        result = pd.merge(records, gcmt_catalog, on='event_id', how='inner')
+        return result["strike1"],result["dip1"],result["slip1"],result["strike2"],result["dip2"],result["slip2"]
+
     def getRecordDf(self, file_names):
         """
             To store the SAC file which matched with catalog
@@ -207,13 +216,14 @@ if __name__ == '__main__':
     catalog_path = "../TSMIP_Dataset/GDMS_catalog.csv"
     catalog = pd.read_csv(catalog_path)
     catalog_process = catalogProcess(catalog, catalog_path)
-    new_datetime = []
-    for i in range(catalog.__len__()):
-        new_datetime.append(
-            catalog_process.GMTtoTaiwanTime(catalog['date'][i],
-                                            catalog['time'][i]))
-    _ = catalog_process.addTaiwanTime(new_datetime)
-    _ = catalog_process.addMw()
+    
+    # new_datetime = []
+    # for i in range(catalog.__len__()):
+    #     new_datetime.append(
+    #         catalog_process.GMTtoTaiwanTime(catalog['date'][i],
+    #                                         catalog['time'][i]))
+    # _ = catalog_process.addTaiwanTime(new_datetime)
+    # _ = catalog_process.addMw()
 
     #! SACProcess
     sac_path = "../TSMIP_Dataset/GuanshanChishangeq"
@@ -229,7 +239,7 @@ if __name__ == '__main__':
     # file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
 
     #! recordProcess
-    stations_path = "../TSMIP_Dataset/GDMS_stations.csv"
+    stations_path = "../TSMIP_Dataset/TSMIP_stations.csv"
     stations = pd.read_csv(stations_path)
     record_process = recordProcess(catalog, stations)
     
@@ -240,7 +250,8 @@ if __name__ == '__main__':
     # _ = record_process.buildRecordFile(record, record_path)
 
     #? step-5 merge Distance
-    # records = pd.read_csv(record_path)
+    records = pd.read_csv(record_path)
+    gcmt_catalog = pd.read_csv("../TSMIP_Dataset/merged_catalog.csv")
     # result = record_process.getDistance(records)
     # records["sta_dist"] = result
 
@@ -250,7 +261,17 @@ if __name__ == '__main__':
     # records["iasp91_S_arrival"] = iasp91_S_arrival
     # _ = record_process.buildRecordFile(records, record_path)
 
-    #? step-7 auto pick
+    #? step-7 merge strike dip slip
+    strike1, dip1, slip1, strike2, dip2, slip2 = record_process.getFocalMechanism(records,gcmt_catalog)
+    records["strike1"] = strike1
+    records["dip1"] = dip1
+    records["slip1"] = slip1
+    records["strike2"] = strike2
+    records["dip2"] = dip2
+    records["slip2"] = slip2
+    _ = record_process.buildRecordFile(records, record_path)
+
+    #? step-8 auto pick
     records = pd.read_csv(record_path)
     # sac_files = sac_process.getSACFile(get_all=False)
     # sac_process.autoPick(records, sac_files)

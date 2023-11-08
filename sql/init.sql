@@ -69,6 +69,8 @@ CREATE TABLE waveform_picking (
     file_name VARCHAR(50) PRIMARY KEY,
     station VARCHAR(10),
     sta_dist Float,
+    iasp91_P_arrival Float,
+    iasp91_S_arrival Float,
     save VARCHAR(1),
     start_time_T4 Float,
     end_time_T3 Float,
