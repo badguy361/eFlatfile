@@ -185,10 +185,33 @@ class recordProcess():
         """
             To get the GCMT Focal mechanism from merged catalog
             Input : records = Dataframe records csv
-            Output : the sta_dist column series
+            Output : the strike dip slip column series
         """
         result = pd.merge(records, gcmt_catalog, on='event_id', how='inner')
         return result["strike1"],result["dip1"],result["slip1"],result["strike2"],result["dip2"],result["slip2"]
+
+    def getFnmFrv(self, records):
+        def Fnm(value):
+            if value == "NULL":
+                return "NA"
+            elif value>-150 and value<-30:
+                return 1
+            else:
+                return 0
+
+        def Frv(value):
+            if value == "NULL":
+                return "NA"
+            elif value>30 and value<150:
+                return 1
+            else:
+                return 0
+        records['Fnm_1'] = records['dip1'].apply(lambda x:Fnm(x))
+        records['Frv_1'] = records['dip1'].apply(lambda x:Frv(x))
+        records['Fnm_2'] = records['dip2'].apply(lambda x:Fnm(x))
+        records['Frv_2'] = records['dip2'].apply(lambda x:Frv(x))
+
+        return records['Fnm_1'],records['Frv_1'],records['Fnm_2'],records['Frv_2']
 
     def getRecordDf(self, file_names):
         """
@@ -262,16 +285,24 @@ if __name__ == '__main__':
     # _ = record_process.buildRecordFile(records, record_path)
 
     #? step-7 merge strike dip slip
-    strike1, dip1, slip1, strike2, dip2, slip2 = record_process.getFocalMechanism(records,gcmt_catalog)
-    records["strike1"] = strike1
-    records["dip1"] = dip1
-    records["slip1"] = slip1
-    records["strike2"] = strike2
-    records["dip2"] = dip2
-    records["slip2"] = slip2
+    # strike1, dip1, slip1, strike2, dip2, slip2 = record_process.getFocalMechanism(records,gcmt_catalog)
+    # records["strike1"] = strike1
+    # records["dip1"] = dip1
+    # records["slip1"] = slip1
+    # records["strike2"] = strike2
+    # records["dip2"] = dip2
+    # records["slip2"] = slip2
+    # _ = record_process.buildRecordFile(records, record_path)
+
+    #? step-8 calculate Fnm Frv
+    Fnm_1, Frv_1, Fnm_2, Frv_2 = record_process.getFnmFrv(records)
+    records["Fnm_1"] = Fnm_1
+    records["Frv_1"] = Frv_1   
+    records["Fnm_2"] = Fnm_2
+    records["Frv_2"] = Frv_2
     _ = record_process.buildRecordFile(records, record_path)
 
-    #? step-8 auto pick
+    #? step-9 auto pick
     records = pd.read_csv(record_path)
     # sac_files = sac_process.getSACFile(get_all=False)
     # sac_process.autoPick(records, sac_files)

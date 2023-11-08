@@ -1,14 +1,11 @@
 import requests
 from config import config
 from logger import logger
-import obspy
-import os
 from dotenv import load_dotenv
 import csv
 from bs4 import BeautifulSoup
 import re
 from urllib.parse import urlsplit
-import json
 import time
 
 class GCMT():

@@ -1,0 +1,2 @@
+gfortran rupturedistance_V2_revised.f90 -o rupturedistance_V2_revised
+./rupturedistance_V2_revised

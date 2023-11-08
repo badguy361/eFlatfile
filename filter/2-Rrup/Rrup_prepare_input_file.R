@@ -1,10 +1,8 @@
 library(dplyr)
-# import records
-rec_FM_Vs30 <- read.table(file="sgm.2021_Frv_Fnm.rec.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
+GDMS.record <- read.table(file="../../TSMIP_Dataset/GDMS_Record.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
 catalog <- read.table(file="../../TSMIP_Dataset/GDMS_catalog.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
-stations <- read.table(file="../../TSMIP_Dataset/GDMS_stations.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
+stations <- read.table(file="../../TSMIP_Dataset/TSMIP_stations.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
 #
-# check <- rec_FM_Vs30[,c(1:3,101:114)]
 ################################################################## 
 
 #!?ˆ©?”¨ç¶“é?—å…¬å¼è?ˆç?—æ–·å±¤é¢ç©ã€é•·å¯¬æ?”ã€æ–·å±¤ç ´è£‚é¢?•·åº¦è?‡å¯¬åº?
@@ -29,19 +27,19 @@ stations <- read.table(file="../../TSMIP_Dataset/GDMS_stations.csv",sep=",",head
 
 ################################################
 # output for Fortran code (plane1)
-tmp = inner_join(x = rec_FM_Vs30, y = catalog, by = "event_id")
+tmp = inner_join(x = GDMS.record, y = catalog, by = "event_id")
 cal.plane1 = inner_join(x = tmp, y = stations, by = "station")
 
 # cal.plane1 <- rec_FM_Vs30
 # cal.plane1 <- rec_FM_Vs30[which((!is.na(rec_FM_Vs30$FM_Index)) & (rec_FM_Vs30$Final_Mw>4.8)),]
-output1 <- cal.plane1[c("event_id","longitude","latitude","Mw","depth","GCMT_Strike1","GCMT_Dip1","Fnm_1","Frv_1","lon","lat","filter.id")] 
-write.table(output1,file="Fortran_plane1/2016_fy_in_plane1.txt",sep=" ",row.names = FALSE, col.names = FALSE, quote = FALSE)  # ,na="0"
+output1 <- cal.plane1[c("event_id","longitude","latitude","Mw","depth","strike1","dip1","Fnm_1","Frv_1","lon","lat","filter_id")] 
+write.table(output1,file="Fortran_plane1/fy_in_plane1.txt",sep=" ",row.names = FALSE, col.names = FALSE, quote = FALSE) 
 
 # output for Fortran code (plane2)
 # cal.plane2 <- rec_FM_Vs30
 # cal.plane1 <- rec_FM_Vs30[which((!is.na(rec_FM_Vs30$FM_Index)) & (rec_FM_Vs30$Final_Mw>4.8)),]
-output2 <- cal.plane1[c("event_id","longitude","latitude","Mw","depth","GCMT_Strike2","GCMT_Dip2","Fnm_2","Frv_2","lon","lat","filter.id")] 
-write.table(output2,file="Fortran_plane2/2016_fy_in_plane2.txt",sep=" ",row.names = FALSE, col.names = FALSE, quote = FALSE)  # ,na="0"
+output2 <- cal.plane1[c("event_id","longitude","latitude","Mw","depth","strike2","dip2","Fnm_2","Frv_2","lon","lat","filter_id")] 
+write.table(output2,file="Fortran_plane2/fy_in_plane2.txt",sep=" ",row.names = FALSE, col.names = FALSE, quote = FALSE)
 
 ################################################
 # go to Fortran_plane1 and Fortran_plane2 Folder to run Fortran code
