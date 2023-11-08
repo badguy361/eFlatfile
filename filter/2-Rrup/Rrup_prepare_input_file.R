@@ -1,5 +1,6 @@
 library(dplyr)
 GDMS.record <- read.table(file="../../TSMIP_Dataset/GDMS_Record.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
+GDMS.record_filtered <- GDMS.record %>% filter(!is.na(filter_id))
 catalog <- read.table(file="../../TSMIP_Dataset/GDMS_catalog.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
 stations <- read.table(file="../../TSMIP_Dataset/TSMIP_stations.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
 #
@@ -27,7 +28,7 @@ stations <- read.table(file="../../TSMIP_Dataset/TSMIP_stations.csv",sep=",",hea
 
 ################################################
 # output for Fortran code (plane1)
-tmp = inner_join(x = GDMS.record, y = catalog, by = "event_id")
+tmp = inner_join(x = GDMS.record_filtered, y = catalog, by = "event_id")
 cal.plane1 = inner_join(x = tmp, y = stations, by = "station")
 
 # cal.plane1 <- rec_FM_Vs30
