@@ -9,7 +9,7 @@ library(RCTC)  # New! for calculating RotD50???...
 ###
 ### LOAD Functions
 ###
-setwd("E:/Yu/eFlatfile/filter/3-Filtering/")
+setwd("/app/filter/3-Filtering/")
 source("SGM_Process/Function_Integrate2VD.r")    
 source("SGM_Process/Function_Integrate_Ia.r")   
 source("SGM_Process/Function_spectraw3.r")    
@@ -61,12 +61,12 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   Lat <- data.info$origins.latitude
   Depth <- data.info$origins.depth
   #
-  # Hypo <- round(data.info$Hypo,2) #è·ŸRrupä¸€æ¨?(??›æ¨äº”å…¥ä½ç½®ä¸ä?€æ¨?)
+  # Hypo <- round(data.info$Hypo,2) #è·ŸRrupä¸€ï¿½?(??ï¿½æ¨äº”å…¥ä½ç½®ä¸ï¿½?ï¿½ï¿½?)
   Rrup <- round(data.info$Adopted_Rrup,1)
   Mw <- data.info$final_Mw
   ML <- data.info$magnitudes.mag
   # hypo <- (((round(data.info$final.Lon,2)-round(data.info$Lon.Sta.X,2))*101.7)**2 + ((round(data.info$final.Lat,2)-round(data.info$Lat.Sta.Y,2))*110.9)**2)**(1/2)
-  # ??‡å¤®è·?
+  # ??ï¿½å¤®ï¿½?
   
   # Instrument_type <- data.info$Instrument
   SGM_SN <- data.info$filter.id #B000001
@@ -75,7 +75,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   file_name <- data.info$file_name #201701010321_EDH_13010321.P18.asc
   print(file_name)
   
-  HP_V <- 0 #é«˜é€šæ¿¾æ³? ä½é€šæ¿¾æ³?
+  HP_V <- 0 #é«˜é€šæ¿¾ï¿½? ä½é€šæ¿¾ï¿½?
   LP_V <- 0
   HP_NS <- 0
   LP_NS <- 0
@@ -98,11 +98,11 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   # }
   
   
-  acc.v <- accs$Z/978.88 #æ­?è¦å?–ç?„æ?‚å¿µ?
+  acc.v <- accs$Z/978.88 #ï¿½?è¦ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½å¿µ?
   acc.h1 <- accs$H1/978.88
   acc.h2 <- accs$H2/978.88
   #  x <- seq(1:dim(acc)[1])*data$DT
-  npts<-dim(accs)[1] #dimå¾—åˆ°è©²table raw?•¸ -> ç¸½å…±??‰å?šå?‘å€‹é??(?Œ¯å¹?)
+  npts<-dim(accs)[1] #dimå¾—åˆ°è©²table raw?ï¿½ï¿½ -> ç¸½å…±??ï¿½ï¿½?ï¿½ï¿½?ï¿½å€‹ï¿½??(?ï¿½ï¿½ï¿½?)
   start.time <- 0.0
   acc.1<- ts(acc.v, deltat=dt, start=start.time) # ts() :time series
   acc.2<- ts(acc.h1, deltat=dt, start=start.time)
@@ -120,7 +120,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   
   #   vel <- integrate2V(acc*978.88)
   #   vel.bs <- integrate2V(acc.bs*978.88)
-  #   #ç©???? ???ä½ç§» 
+  #   #ï¿½???? ???ä½ç§» 
   #   dis <- integrate2D(vel)
   #   dis.bs <- integrate2D(vel.bs)
   # 
@@ -139,9 +139,9 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     #     negative nDC means the mean of whole record; otherwise mean is 
     #     taken as the average of the first nDC points
     #
-    if (nDC < 0) 	acc <- acc - mean(acc[1:npts]) else 	acc <- acc - mean(acc[1:nDC]) #?Ÿºç·šæ ¡æ­???„æ?›å??2000é»å¹³???
+    if (nDC < 0) 	acc <- acc - mean(acc[1:npts]) else 	acc <- acc - mean(acc[1:nDC]) #?ï¿½ï¿½ç·šæ ¡ï¿½???ï¿½ï¿½?ï¿½ï¿½??2000é»å¹³???
     
-    # D. ?Ÿºç·šæ ¡æ­?
+    # D. ?ï¿½ï¿½ç·šæ ¡ï¿½?
     #  Add=2
     #  Skip=0
     #  tb=5
@@ -151,9 +151,9 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     if (tb > 0) nb <- npts * tb / 100 else nb <- tb  #tb?
     if (te > 0) ne <- npts * te / 100 else ne <- te	 #te?
     if (Taper > 0) nTaper <- npts * Taper / 100 else nTaper <- Taper
-    nSkip <- ceiling(Skip/dt) #ceiling??›æ¨äº”å…¥ skip?
+    nSkip <- ceiling(Skip/dt) #ceiling??ï¿½æ¨äº”å…¥ skip?
     nAdd  <- ceiling(Add/dt) # add?
-    acc.bs  <- BslnAdj(acc, nTaper, nSkip, nAdd) #ä»¥æ?€å°å¹³?–¹æ³•æ“¬??ˆå‡ºä½ç§»æ­·æ?‚ä?‹åŸºç·?
+    acc.bs  <- BslnAdj(acc, nTaper, nSkip, nAdd) #ä»¥ï¿½?ï¿½å°å¹³?ï¿½ï¿½æ³•æ“¬??ï¿½å‡ºä½ç§»æ­·ï¿½?ï¿½ï¿½?ï¿½åŸºï¿½?
     
     vel <- integrate2V(acc*978.88)
     vel.bs <- integrate2V(acc.bs*978.88)
@@ -164,13 +164,13 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     
     #  graphics.off()
     #  .SavedPlots <- NULL # Deletes any existing plot history
-    #  windows(record = TRUE, width = 9, height = 9)
-    windows(width = 6, height = 6)
+    #  X11(record = TRUE, width = 9, height = 9)
+    X11(width = 6, height = 6)
     layout(matrix(1:3,3,1))
     #... 1. Acceleration time history
-    plot(acc, type="l", ylab="Acceleration (g)", xlab="time (sec)") #è·‘æ?‰ç?„ç??
-    lines(acc.bs, col=6) #col -> pink ?Ÿºç·šæ ¡æ­???å?Œç?„ç??
-    abline(h=0) #y = 0?•«ä¸€æ¢ç??
+    plot(acc, type="l", ylab="Acceleration (g)", xlab="time (sec)") #è·‘ï¿½?ï¿½ï¿½?ï¿½ï¿½??
+    lines(acc.bs, col=6) #col -> pink ?ï¿½ï¿½ç·šæ ¡ï¿½???ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½??
+    abline(h=0) #y = 0?ï¿½ï¿½ä¸€æ¢ï¿½??
     title(paste(EQ_ID,STA_ID,"Acceleration Time History",file_id,text.comp,"Baseline Correction", sep=",   "))
     points(which.max(abs(acc.bs))*dt,acc.bs[which.max(abs(acc.bs))], pch=18, col=2, cex=2)
     text(0,max(acc.bs)*0.5,substr(paste("PGA=",max(abs(acc.bs))),1,12), pos=4)
@@ -195,8 +195,8 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     ################
     
     path.1=paste(path2,"/",SGM_ID,".",SGM_SN,".AVD_bc.",text.comp,".png",sep="" )
-    CairoPNG(filename = path.1, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #å­˜æ?”æ??(bc)(?”¨CairoPNGå­˜æ?”è?ƒå¥½???)
-    # windows(width = 9, height = 9) 
+    CairoPNG(filename = path.1, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #å­˜ï¿½?ï¿½ï¿½??(bc)(?ï¿½ï¿½CairoPNGå­˜ï¿½?ï¿½ï¿½?ï¿½å¥½???)
+    # X11(width = 9, height = 9) 
     layout(matrix(1:4,4,1), heights=c(1.5,4,4,4))
     text1 <-paste(EQ_ID,STA_ID,file_id,"Baseline Correction",text.comp, sep=",   ")
     #text2 <-paste(paste0("ML = ",ML),paste0("Hypo = ",Hypo," (km)"), sep=",   ")
@@ -204,7 +204,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     par(mar = c(0,0,0,0)) 
     plot(0,0, ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
     #text(x = 0.1, y = 0, text1, cex = 1.7, col = "black",font=2)
-    text(x = 0.1, y = -0.8, text2, cex = 1.5, col = "blue",font=1) #Mw Rrup??„å?—é?”é?è‰²å¤§å??..
+    text(x = 0.1, y = -0.8, text2, cex = 1.5, col = "blue",font=1) #Mw Rrup??ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½è‰²å¤§ï¿½??..
     #... 1. Acceleration time history
     par(mar = c(4,4,4,0)) 
     plot(acc, type="l" , ylab="Acceleration (g)", xlab="time (sec)",main=NULL) 
@@ -234,12 +234,12 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     
     ###########################
     #  qc <- setqc()
-    # ?•«??‹å?•æ?‘æ³¢??„å??
+    # ?ï¿½ï¿½??ï¿½ï¿½?ï¿½ï¿½?ï¿½æ³¢??ï¿½ï¿½??
     #... PSV (pseudo spectral velocit; tripartite plot would be better)
-    rsp <- spectraw2(acc.bs, 0.05, 'psv') # spectraw2(acc.bs, damping, 'psv') ?•«??æ?‰è?œå?šæ¿¾æ³?
+    rsp <- spectraw2(acc.bs, 0.05, 'psv') # spectraw2(acc.bs, damping, 'psv') ?ï¿½ï¿½??ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½æ¿¾ï¿½?
     
-    # windows(width = 15, height = 9)
-    windows(width = 10, height = 6)
+    # X11(width = 15, height = 9)
+    X11(width = 10, height = 6)
     layout(matrix(1:2,1,2))
     plot_spectra(rsp, "psv")
     ## new part (2021.03.26)
@@ -249,27 +249,27 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     
     # filtered by human
     fc <- c()
-    tmp <- locator(n=1, type='p', pch=16, col=6) #locator??‹é?ç?„ä?ç½®åº§æ??
-    fc[1] <- 1./tmp$x[1] #å¾—å…¶? »???(?€±æ?Ÿå€’æ•¸)
+    tmp <- locator(n=1, type='p', pch=16, col=6) #locator??ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ç½®åº§ï¿½??
+    fc[1] <- 1./tmp$x[1] #å¾—å…¶?ï¿½ï¿½???(?ï¿½ï¿½ï¿½?ï¿½å€’æ•¸)
     fc[2] <- 100
     # print(c(fc[1]))
     # print(c(fc[2]))
     
-    # ??šå?…ç?‹è?‰è?‰æ??(è¦æ¿¾æ³¢ä??)
+    # ??ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½??(è¦æ¿¾æ³¢ï¿½??)
     nfft <- 2^(floor(logb(npts,2))+1) # logb(npts,2) = log2(npts)
     nNyq <- nfft/2+1
     idf <- 1.0/(nfft*dt)
     freqs <- (seq(1:nNyq)-1)*idf
-    #æ¹Šé•·åº?????‚º2???æ¬???? 
+    #æ¹Šé•·ï¿½?????ï¿½ï¿½2???ï¿½???? 
     acc.bs2 <- c(acc.bs, rep(0, nfft-npts))
     #... Foward FFT
     fs <- fft(acc.bs2)
     fs.amp <- abs(fs[1:nNyq])
-    fs.amp_o <- abs(fs[1:nNyq])    # fs.amp[-1] : ???fs.ampç¬????????•¸å­—æ‹¿???
+    fs.amp_o <- abs(fs[1:nNyq])    # fs.amp[-1] : ???fs.ampï¿½????????ï¿½ï¿½å­—æ‹¿???
     plot(c(0.01,100), range(fs.amp[-1]), log='xy', type='n',xlab='Frequency (Hz)', ylab='Fourier Amplitude')
     title(paste(text.comp," Component"))
     lines(freqs[-1], fs.amp[-1], type='l', lwd=2,col=6)
-    abline(v=array(outer(1:9, c(0.01,0.1,1,10,100))), col=8, lty=2) #æ¨™å‡º?³å°‡highpass??æ³¢æ®µç?„æ³¢
+    abline(v=array(outer(1:9, c(0.01,0.1,1,10,100))), col=8, lty=2) #æ¨™å‡º?ï¿½ï¿½å°‡highpass??ï¿½æ³¢æ®µï¿½?ï¿½æ³¢
     abline(h=c(0.00001,0.0001,0.001,0.01,0.1,1,10,100), col=8, lty=2) 
     
     # # all auto-filtering
@@ -302,7 +302,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     abline(v=fc, col=6, lwd=2)
     
     path.4=paste(path2,"/",SGM_ID,".",SGM_SN,".FFT.",text.comp,".png",sep="")
-    CairoPNG(filename = path.4, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #å­˜å?…ç?‹è?‰è?‰æ?›ç?„å??(FFT)
+    CairoPNG(filename = path.4, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #å­˜ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½??(FFT)
     plot(c(0.01,100), range(fs.amp[-1]), log='xy', type='n',xlab='Frequency (Hz)', ylab='Fourier Amplitude')
     title(paste(EQ_ID,STA_ID,paste(text.comp,"Component"), sep=",   "),line = 2.2)
     title(text2,line = 0.8)
@@ -316,34 +316,34 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     #
     #... Prepare Fourier spectrum for inverse FFT
     #
-    fs[1] <- complex(real=Re(fs[1]), imaginary=0) #complex??›æ•¸(?›®??è?›æ•¸=0)
+    fs[1] <- complex(real=Re(fs[1]), imaginary=0) #complex??ï¿½æ•¸(?ï¿½ï¿½??ï¿½ï¿½?ï¿½æ•¸=0)
     fs[nNyq] <- complex(real=Re(fs[nNyq]), imaginary=0)
-    fs[nfft+2-(2:(nfft/2))] <- Conj(fs[2:(nfft/2)]) #conj?…±è»›è?‡æ•¸
+    fs[nfft+2-(2:(nfft/2))] <- Conj(fs[2:(nfft/2)]) #conj?ï¿½ï¿½è»›ï¿½?ï¿½æ•¸
     
     #	
     #... Inverse FF 
     #
-    acc.flt <- ts(data=Re(fft(fs, inverse=T))/nfft, deltat=dt, start=start.time) #??å?šä?€æ¬¡å?…ç?‹è?‰è?‰æ?›å?æ?‚é?“å?? Reå¾—åˆ°è©²è?‡æ•¸??„å¯¦?•¸
+    acc.flt <- ts(data=Re(fft(fs, inverse=T))/nfft, deltat=dt, start=start.time) #??ï¿½ï¿½?ï¿½ï¿½?ï¿½æ¬¡ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?? Reå¾—åˆ°è©²ï¿½?ï¿½æ•¸??ï¿½å¯¦?ï¿½ï¿½
     
     #
     #... Keep only the original length
     #  
-    acc.flt <- ts(acc.flt[1:npts], deltat=dt, start=start.time) #è®Šæ?å?Ÿæœ¬??„dtç¸½æ•¸
+    acc.flt <- ts(acc.flt[1:npts], deltat=dt, start=start.time) #è®Šï¿½?ï¿½ï¿½?ï¿½æœ¬??ï¿½dtç¸½æ•¸
     
     #	
     #... Correct baseline drift after filtering	
     #
-    if (Baseline) acc.flt <- BslnAdj(acc.flt, nTaper, nSkip, nAdd) #??é€²è?Œä?€æ¬¡åŸºç·šæ ¡æ­?
+    if (Baseline) acc.flt <- BslnAdj(acc.flt, nTaper, nSkip, nAdd) #??ï¿½é€²ï¿½?ï¿½ï¿½?ï¿½æ¬¡åŸºç·šæ ¡ï¿½?
     vel.flt <- integrate2V(acc.flt*981)
     dis.flt <- integrate2D(vel.flt)
     
     #	
     #... Plot filtered and baseline-corrected time histories
     #
-    windows(width = 6, height = 6)
+    X11(width = 6, height = 6)
     layout(matrix(1:3,3,1))
     #... 1. Acceleration time history
-    plot(acc.bs, type="l", ylab="Acceleration (g)", xlab="time (sec)") #?•«?Ÿºç·šæ ¡æ­?+æ¿¾æ³¢+??åŸºç·šæ ¡æ­?å¾Œç?„å??
+    plot(acc.bs, type="l", ylab="Acceleration (g)", xlab="time (sec)") #?ï¿½ï¿½?ï¿½ï¿½ç·šæ ¡ï¿½?+æ¿¾æ³¢+??ï¿½åŸºç·šæ ¡ï¿½?å¾Œï¿½?ï¿½ï¿½??
     lines(acc.flt, col=6)
     abline(h=0)
     title(paste(EQ_ID ,STA_ID,"Acceleration Time History",file_id,text.comp,"Filtering", sep=",   "))
@@ -368,7 +368,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     text(0,min(dis.flt)*0.8,paste(text.comp," component"), pos=4)
     
     path.2=paste(path2,"/",SGM_ID,".",SGM_SN,".AVD_fl.",text.comp,".png",sep="")
-    CairoPNG(filename = path.2, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #??Šå?–å?˜èµ·ä¾?(fl)
+    CairoPNG(filename = path.2, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #??ï¿½ï¿½?ï¿½ï¿½?ï¿½èµ·ï¿½?(fl)
     layout(matrix(1:4,4,1), heights=c(1.5,4,4,4))
     par(mar = c(0,0,0,0))
     plot(0,0, ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
@@ -406,8 +406,8 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     #... Compute and plot response spectra
     rsp.flt <- spectraw2(acc.flt, 0.05, "psa") 
     #	rsp <- spectraw2(acc.bs, 0.05, "psa")
-    windows(width = 6, height = 6)
-    plot_spectra(rsp.flt, "psv") #?•«??æ?‰è??(psv) ç¬¬å?›å¼µ???
+    X11(width = 6, height = 6)
+    plot_spectra(rsp.flt, "psv") #?ï¿½ï¿½??ï¿½ï¿½?ï¿½ï¿½??(psv) ç¬¬ï¿½?ï¿½å¼µ???
     lines(rsp$Period, rsp$psv, type='l', lwd=2, col=8)
     uband <- 1.0/fc/1.25
     mtext(paste("Bandpass Filtered Between ", signif(fc[1],4), '(Hz) and ', signif(fc[2],4), "(Hz)", sep=''), line=2)
@@ -441,7 +441,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     ### psa
     path.3=paste(path2,"/",SGM_ID,".",SGM_SN,".rsp_psa.",text.comp,".png",sep="")
     CairoPNG(filename = path.3, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
-    plot_spectra(rsp.flt, "psa") #?•«PSA??æ?‰è??
+    plot_spectra(rsp.flt, "psa") #?ï¿½ï¿½PSA??ï¿½ï¿½?ï¿½ï¿½??
     lines(rsp$Period, rsp$psa, type='l', lwd=2, col=8)
     uband <- 1.0/fc/1.25
     mtext(paste("Bandpass Filtered Between ", signif(fc[1],4), '(Hz) and ', signif(fc[2],4), "(Hz)", sep=''), line=2)
@@ -461,7 +461,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     if(i ==1) rsp_V <- rsp.flt else if(i == 2) rsp_NS <-rsp.flt else rsp_EW <- rsp.flt
     
     #Write_to_DB(SGM_SN,SGM_ID,EQ_ID,EVN_ID,STA_ID,i,nPole,fc[1],fc[2],PGA,PGV,PGD,rsp$psa,author)
-    acc.md5 <- digest(paste(acc.flt, collapse=","), serialize=FALSE) #ä¸é?è?å?Œé¢æ²’ç”¨?ˆ°
+    acc.md5 <- digest(paste(acc.flt, collapse=","), serialize=FALSE) #ä¸ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½é¢æ²’ç”¨?ï¿½ï¿½
     #Write_to_DB(file_id,Pfile,file_name,i,nPole,fc[1],fc[2],PGA,PGV,PGD,rsp$psa,author,acc.md5)
     #Write_to_DB_sort(file_id,Pfile,file_name,i,nPole,fc[1],fc[2],PGA,PGV,PGD,author,acc.md5)
     
@@ -471,7 +471,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     
     ### for running RCTC 
     if(i ==2){
-      NS <- c(dt,acc.flt) #è¼¸å…¥æ¿¾å?Œæ³¢å¾Œç?„æ±?±
+      NS <- c(dt,acc.flt) #è¼¸å…¥æ¿¾ï¿½?ï¿½æ³¢å¾Œï¿½?ï¿½æ±?ï¿½ï¿½
       write.table(NS,file=paste0("Tmp_save_file/NS.txt"),col.names = FALSE,row.names = FALSE)
     } else if (i==3) {
       EW <- c(dt,acc.flt)
@@ -479,10 +479,10 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
     }
     nametransfer(filedir1 = paste0("Tmp_save_file/NS.txt"), filedir2 =paste0("Tmp_save_file/EW.txt"), stationname = SGM_SN , sn = SGM_ID,
                 outputdir = 'Tmp_save_file/Inputdata')
-                #å¾—åˆ°RoTD50??„è?‡æ??
+                #å¾—åˆ°RoTD50??ï¿½ï¿½?ï¿½ï¿½??
   }  #end of loop 3 component
   
-  # ç´€??„åœ°??‡æ³¢??„è?‡æ??
+  # ç´€??ï¿½åœ°??ï¿½æ³¢??ï¿½ï¿½?ï¿½ï¿½??
   xx<- data.frame(SGM_SN)
   xx$SGM_ID<-SGM_ID
   #xx$EVN_ID<-EVN_ID
@@ -519,7 +519,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   
   graphics.off()
   
-  # ç´€??„å?æ?‰è?œç?„è?‡æ??
+  # ç´€??ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½??
   ### output psv, psa data
   yy <- data.frame()
   # copy from Function_Process_main_step2.R
@@ -547,7 +547,7 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   
   ### geomean value response spectrum
   path.12=paste(path2,"/",SGM_ID,".",SGM_SN,".GM_rsp_shape.png",sep="")
-  CairoPNG(filename = path.12, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #å­˜èµ·ä¾†æ?€å¾Œç?„å?æ?‰è?? ?…¶pgaå¹³æ–¹å¾Œç?„ç?æ??
+  CairoPNG(filename = path.12, width = 1280, height = 1024 ,pointsize = 24, bg = "white") #å­˜èµ·ä¾†ï¿½?ï¿½å¾Œï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?? ?ï¿½ï¿½pgaå¹³æ–¹å¾Œï¿½?ï¿½ï¿½?ï¿½ï¿½??
   y <- psa.sqrt
   yrange <- range(y)
   yrange[1] <- 10^(floor(log10(yrange[1])))

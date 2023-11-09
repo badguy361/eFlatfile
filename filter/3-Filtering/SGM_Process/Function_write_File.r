@@ -6,9 +6,9 @@
 Write_to_file <- function(SGM_ID,EQ_ID,Year,Month,Day,Hour,Minute,Sec,Lon,Lat,Depth,ML,Distance,Hypo,
                           STA_ID,DT,npts,Instrument_type,PGA_V,PGA_NS,PGA_EW,PGV_V,PGV_NS,PGV_EW,
                           PGD_V,PGD_NS,PGD_EW,HP_V,HP_NS,HP_EW,LP_V,LP_NS,LP_EW,author,Z,NS,EW,SGM_SN){
-  path1 <- paste("C:/Users/User/Desktop/2018_Subduction zone earthquakes_research/201807_thesis/SA/小葉濾波程式/07_SGM/PROCESS_FILE/",Year,sep="")
-  path2 <- paste("C:/Users/User/Desktop/2018_Subduction zone earthquakes_research/201807_thesis/SA/小葉濾波程式/07_SGM/PROCESS_FILE/",Year,"/",EQ_ID,sep="")
-  path3 <- paste("C:/Users/User/Desktop/2018_Subduction zone earthquakes_research/201807_thesis/SA/小葉濾波程式/07_SGM/PROCESS_FILE/",Year,"/",EQ_ID,"/ACC",sep="")
+  path1 <- paste("/app/filter/3-Filtering/PROCESS_FILE/",Year,sep="")
+  path2 <- paste("/app/filter/3-Filtering/PROCESS_FILE/",Year,"/",EQ_ID,sep="")
+  path3 <- paste("/app/filter/3-Filtering/PROCESS_FILE/",Year,"/",EQ_ID,"/ACC",sep="")
   
   ifelse(file.exists(path1),paste("file exit!"),dir.create(path1))
   ifelse(file.exists(path2),paste("file exit!"),dir.create(path2))

@@ -1,6 +1,7 @@
-install.packages("digest")
 install.packages("Cairo")
 install.packages("RSEIS")
+install.packages("digest")
+install.packages(c('Rcpp', 'pracma'))
 install.packages("devtools")
 library(devtools)
 install_github('wltcwpf/RCTC')

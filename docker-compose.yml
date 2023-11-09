@@ -1,7 +1,9 @@
 version: '3'
 services:
   python_sac:
-    build: ./
+    build: 
+      context: .
+      dockerfile: dockerfile.python_sac
     ports:
       - "8000:7000"
     environment:
@@ -12,7 +14,9 @@ services:
     tty: true
 
   r:
-    image: r-base
+    build: 
+      context: .
+      dockerfile: dockerfile.r
     ports:
       - "7001:7000"
     environment:
