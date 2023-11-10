@@ -4,9 +4,9 @@ records <- read.table(file="../../TSMIP_Dataset/GDMS_Record.csv",sep=",",header=
 catalog <- read.table(file="../../TSMIP_Dataset/GDMS_catalog.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
 stations <- read.table(file="../../TSMIP_Dataset/TSMIP_stations.csv",sep=",",header=TRUE,stringsAsFactors = FALSE)
 
-catalog_selected <- catalog %>% select("event_id", "longitude", "latitude", "depth") %>%
-        rename(eq_longitude = longitude,
-               eq_latitude = latitude,
+catalog_selected <- catalog %>% select("event_id", "lon", "lat", "depth") %>%
+        rename(eq_longitude = lon,
+               eq_latitude = lat,
                eq_depth = depth)
 stations_selected <- stations %>% select("station", "lon", "lat") %>%
         rename(sta_longitude = lon,

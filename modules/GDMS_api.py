@@ -95,7 +95,7 @@ class GDMS():
                     },...]
             Output: csv file
         """
-        columns = ['event_id', 'date', 'time', 'ms', 'latitude', 'longitude', 'depth', 'ML',\
+        columns = ['event_id', 'date', 'time', 'ms', 'lat', 'lon', 'depth', 'ML',\
                     'nstn', 'dmin', 'gap', 'trms', 'ERH', 'ERZ', 'fixed', 'nph', 'quality']
         with open(csv_output_name, mode='w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=columns)

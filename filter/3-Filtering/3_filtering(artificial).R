@@ -43,35 +43,43 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   # te=5
   # nPole=2.5
   
-  data.info  <- filter.frame[filter.frame$filter.id==filter.ID,]
-  rpage <- as.character(paste0("../../TSMIP_Dataset/picking_result/09/",str_pad(data.info$Month,2, pad = "0"),"/",data.info$Pfile)) 
+  data.info  <- filter.frame[filter.frame$filter_id==filter.ID,]
+  rpage <- as.character(paste0("../../TSMIP_Dataset/picking_result/09/",str_pad(data.info$Month,2, pad = "0"),"/",paste0(data.info$file_name,".asc")))
   accs  <- read.table(rpage, skip=1, col.names=c("time","Z","H1","H2"))
   
   dt <- accs$time[2]-accs$time[1]
-  YEAR <- data.info$Year
-  MON <- data.info$Month
-  DAY <- data.info$Date
-  HOUR <- data.info$Hour
-  MINUTE <- data.info$Minute
-  SEC <- data.info$Second_event
-  SGM_ID <- data.info$rec.id #2017_0101_0321_57_EDH
-  EQ_ID <- data.info$EQ_ID #2017_0101_0321_57
-  STA_ID <- data.info$Sta #EDH
-  Lon <- data.info$origins.longitude
-  Lat <- data.info$origins.latitude
-  Depth <- data.info$origins.depth
+  YEAR <- data.info$year
+  MON <- data.info$month
+  DAY <- data.info$day
+  HOUR <- data.info$hour
+  MINUTE <- data.info$minute
+  SEC <- data.info$second
+  SGM_ID <- sprintf("%04d_%02d%02d_%02d%02d_%02d_%03s", 
+                           data.info$year, 
+                           data.info$month, 
+                           data.info$day, 
+                           data.info$hour, 
+                           data.info$minute, 
+                           data.info$second,
+                           data.info$station) #2017_0101_0321_57_EDH
+  EQ_ID <- sprintf("%04d_%02d%02d_%02d%02d_%02d", 
+                           data.info$year, 
+                           data.info$month, 
+                           data.info$day, 
+                           data.info$hour, 
+                           data.info$minute, 
+                           data.info$second) #2017_0101_0321_57
+  STA_ID <- data.info$station #EDH
   #
   # Hypo <- round(data.info$Hypo,2) #跟Rrup一�?(??�捨五入位置不�?��?)
   Rrup <- round(data.info$Adopted_Rrup,1)
-  Mw <- data.info$final_Mw
-  ML <- data.info$magnitudes.mag
-  # hypo <- (((round(data.info$final.Lon,2)-round(data.info$Lon.Sta.X,2))*101.7)**2 + ((round(data.info$final.Lat,2)-round(data.info$Lat.Sta.Y,2))*110.9)**2)**(1/2)
-  # ??�央�?
+  Mw <- data.info$Mw
+  ML <- data.info$ML
   
   # Instrument_type <- data.info$Instrument
   SGM_SN <- data.info$filter.id #B000001
-  file_id <- data.info$Pfile #13010321.P18
-  Pfile <- data.info$Pfile
+  file_id <- data.info$filter.id #B000001
+  Pfile <- paste0(data.info$file_name,".asc")
   file_name <- data.info$file_name #201701010321_EDH_13010321.P18.asc
   print(file_name)
   
@@ -572,26 +580,26 @@ ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, S
   dev.off()
 }
 
-filter.frame <- read.csv(file="sgm.2021_Frv_Fnm.rec_Rrup.csv",sep=",",header = TRUE,stringsAsFactors = FALSE)
-for (i in 1:14){
-  if (i < 10){
-    filter.ID= paste0("B00000",i)
-    print(filter.ID)
-    ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
-  }
-  else if (i>=10 && i<100){
-    filter.ID= paste0("B0000",i)
-    print(filter.ID)
-    ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
-  }
-  else{
-    filter.ID= paste0("B000",i)
-    print(filter.ID)
-    ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
-  }
-}
+filter.frame <- read.csv(file="../../TSMIP_Dataset/GDMS_Record.csv",sep=",",header = TRUE,stringsAsFactors = FALSE)
+# for (i in 1:14){
+#   if (i < 10){
+#     filter.ID= paste0("B00000",i)
+#     print(filter.ID)
+#     ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+#   }
+#   else if (i>=10 && i<100){
+#     filter.ID= paste0("B0000",i)
+#     print(filter.ID)
+#     ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+#   }
+#   else{
+#     filter.ID= paste0("B000",i)
+#     print(filter.ID)
+#     ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+#   }
+# }
 
 
-# filter.ID= "B000841"
-# ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
-# 
+filter.ID= "B00001"
+ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+
