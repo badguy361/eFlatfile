@@ -29,8 +29,8 @@ class afterPickProcess():
         self.record.to_csv("../TSMIP_Dataset/GDMS_Record.csv",index=False,na_rep='NA')
 
     def removeNofilter(self):
-        self.record.dropna(subset=['filter_id'])
-        self.record.to_csv("../TSMIP_Dataset/GDMS_Record.csv",index=False)
+        self.record.dropna().to_csv("../TSMIP_Dataset/GDMS_Record.csv",index=False)
+
 
 if __name__ == '__main__':
     record = pd.read_csv("../TSMIP_Dataset/GDMS_Record.csv")
