@@ -15,6 +15,7 @@ load_dotenv()
 # cookie_value = cookies.get('PHPSESSID')
 # print(retur.text)
 
+
 class GDMS():
     """
         A class for interacting with the GDMS API and its following process.
@@ -41,7 +42,7 @@ class GDMS():
             self.rs = requests.session()
             response = self.rs.post(
                 login_url, data=login_data
-            )  #login logic: After login it will set up the session id in this machine, and it could login through this info
+            )  # login logic: After login it will set up the session id in this machine, and it could login through this info
             if response.status_code == 200:
                 logger.info("Logged in to GDMS")
             elif response.status_code != 200:
@@ -95,8 +96,8 @@ class GDMS():
                     },...]
             Output: csv file
         """
-        columns = ['event_id', 'date', 'time', 'ms', 'lat', 'lon', 'depth', 'ML',\
-                    'nstn', 'dmin', 'gap', 'trms', 'ERH', 'ERZ', 'fixed', 'nph', 'quality']
+        columns = ['event_id', 'date', 'time', 'ms', 'lat', 'lon', 'depth', 'ML',
+                   'nstn', 'dmin', 'gap', 'trms', 'ERH', 'ERZ', 'fixed', 'nph', 'quality']
         with open(csv_output_name, mode='w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=columns)
             writer.writeheader()
@@ -111,7 +112,7 @@ class GDMS():
         instrument_response = config.get("instrument_response")
         try:
             results = self.rs.post(get_catalog_url,
-                                    data=instrument_response)
+                                   data=instrument_response)
             if results.status_code == 200:
                 logger.info(
                     "Get instrument response successed, please check infomation in GDMS website"
@@ -143,24 +144,28 @@ class GDMS():
             Output: [./userdata/3ef24bbfa8abe4f408a52ad299e582d7/All.tgz, ...]
         """
         total_url = []
-        matching_entries = [entry for entry in result if re.match(fr'{date}', entry['datetime'])]
+        matching_entries = [entry for entry in result if re.match(
+            fr'{date}', entry['datetime'])]
         for matching_entry in matching_entries:
-            parser = BeautifulSoup(matching_entry['show_status'], 'html.parser')
+            parser = BeautifulSoup(
+                matching_entry['show_status'], 'html.parser')
             url = parser.find("a").get('href')
             total_url.append(url)
         return total_url
-    
+
     def autoDownloadData(self, total_url, file_path):
         """
             To download data from the download link
             Input: [./userdata/3ef24bbfa8abe4f408a52ad299e582d7/All.tgz, ...]
         """
         for url in total_url:
-            file_name = urlsplit(url).path.split("/")[-1] # To get file name from the url
+            file_name = urlsplit(url).path.split(
+                "/")[-1]  # To get file name from the url
             download_link = self.api_url + url[1:]
             response = requests.get(download_link)
             with open(file_path+file_name, 'wb') as file:
                 file.write(response.content)
+
 
 if __name__ == '__main__':
     gdms = GDMS()
@@ -175,4 +180,3 @@ if __name__ == '__main__':
     # date = '2023-10-14'
     # total_url = gdms.getDownUrl(result, date)
     # _ = gdms.autoDownloadData(total_url, file_path)
-    

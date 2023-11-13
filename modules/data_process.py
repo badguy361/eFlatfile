@@ -10,6 +10,7 @@ import numpy as np
 import subprocess
 from logger import logger
 
+
 class SACProcess():
 
     def __init__(self, sac_path, instrument_path):
@@ -24,7 +25,7 @@ class SACProcess():
             total_files = glob.glob(f"{self.sac_path}/*.SAC")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
-    
+
     def getInstrumentFile(self):
         """
             Output: ['SAC_PZs_TW_A002_HLE_10_2019.051.00.00.00.0000_2599.365.23.59.59.99999',..]
@@ -32,7 +33,7 @@ class SACProcess():
         total_files = glob.glob(f"{self.instrument_path}/*All*.99999")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
-    
+
     def removeInstrumentResponse(self, sac_file_names, instrument_file):
         """
             To remove instrument response by instrument file. Please don't remove twice !!!
@@ -48,7 +49,7 @@ class SACProcess():
             s += "w over \n"
             s += "q \n"
             subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
-                        s.encode())
+                s.encode())
         logger.info("remove finished.")
 
     def reName(self, path, file_name):
@@ -61,22 +62,24 @@ class SACProcess():
         year, day_of_year, time = timestamp
         formatted_timestamp = datetime.strptime(f"{year}{day_of_year}{time}",
                                                 "%Y%j%H%M%S")
-        time_difference = timedelta(hours=8,minutes=2)
-        formatted_timestamp =  formatted_timestamp + time_difference
+        time_difference = timedelta(hours=8, minutes=2)
+        formatted_timestamp = formatted_timestamp + time_difference
         converted_timestamp = formatted_timestamp.strftime('%Y%m%d%H%M%S')
         pattern = r'\d{4}\.\d{3}\.\d+'
         new_file_name = re.sub(pattern, converted_timestamp, file_name)
         os.rename(f"{path}/{file_name}", f"{path}/{new_file_name}")
         return new_file_name
 
-    def _getArrivalTime(self, records ,sac_HLE):
+    def _getArrivalTime(self, records, sac_HLE):
         """
             To get arrival time from record
         """
-        P_arrive = records[records["file_name"] == sac_HLE]["iasp91_P_arrival"].values[0]+120
-        S_arrive = records[records["file_name"] == sac_HLE]["iasp91_S_arrival"].values[0]+120
+        P_arrive = records[records["file_name"] ==
+                           sac_HLE]["iasp91_P_arrival"].values[0]+120
+        S_arrive = records[records["file_name"] ==
+                           sac_HLE]["iasp91_S_arrival"].values[0]+120
         return P_arrive, S_arrive
-    
+
     def autoPick(self, records, sac_file_names):
         """
             To pick the p and s wave by record data
@@ -85,7 +88,7 @@ class SACProcess():
             sac_HLE = sac_file_name
             sac_HLN = re.sub("HLE", "HLN", sac_file_name)
             sac_HLZ = re.sub("HLE", "HLZ", sac_file_name)
-            P_arrive , S_arrive = self._getArrivalTime(records ,sac_file_name)
+            P_arrive, S_arrive = self._getArrivalTime(records, sac_file_name)
 
             s = f"r {self.sac_path}/{sac_HLZ} \
                 {self.sac_path}/{sac_HLE} \
@@ -95,15 +98,16 @@ class SACProcess():
             s += "w over \n"
             s += "q \n"
             subprocess.Popen(['sac'], stdin=subprocess.PIPE).communicate(
-                        s.encode())
+                s.encode())
         logger.info("auto pick finished.")
+
 
 class catalogProcess():
 
     def __init__(self, catalog, catalog_path):
         self.catalog_path = catalog_path
         self.catalog = catalog
-    
+
     def GMTtoTaiwanTime(self, date, time):
         """
             To change CWB catalog GMT+0 time to GMT+8 Taiwan time
@@ -146,7 +150,7 @@ class recordProcess():
         self.gdms_catalog = gdms_catalog
         self.stations = stations
         self.gcmt_catalog = gcmt_catalog
-    
+
     def getDistance(self, records):
         """
             To calculate the distance between the station and earthquake
@@ -155,7 +159,8 @@ class recordProcess():
         """
         tmp = pd.merge(records, self.gdms_catalog, on='event_id', how='inner')
         result = pd.merge(tmp, self.stations, on='station', how='inner')
-        result["sta_dist"] = (((result["lon_x"]-result["lon_y"])*101.7)**2 +  ((result["lat_x"]-result["lat_y"])*110.9)**2 +  (result["depth"]-result["height"])**2)**(1/2)
+        result["sta_dist"] = (((result["lon_x"]-result["lon_y"])*101.7)**2 + (
+            (result["lat_x"]-result["lat_y"])*110.9)**2 + (result["depth"]-result["height"])**2)**(1/2)
         return result["sta_dist"]
 
     def getArrivalTime(self, records):
@@ -164,17 +169,17 @@ class recordProcess():
             Input : records = Dataframe records csv
             Output : list P_arrival and S_arrival 
         """
-        result = pd.merge(records, self.gdms_catalog, on='event_id', how='inner')
+        result = pd.merge(records, self.gdms_catalog,
+                          on='event_id', how='inner')
         iasp91_P_arrival = []
         iasp91_S_arrival = []
         for i in tqdm(range(result.shape[0])):
             try:
-                model = TauPyModel(model='iasp91') #jb pwdk can test 
-                dist = kilometer2degrees(result["sta_dist"][i]) 
+                model = TauPyModel(model='iasp91')  # jb pwdk can test
+                dist = kilometer2degrees(result["sta_dist"][i])
                 depth = result["depth"][i]
-                arrivals = model.get_travel_times\
-                    (source_depth_in_km=depth, distance_in_degree=dist,\
-                    phase_list=["P","S",'p','s'])
+                arrivals = model.get_travel_times(source_depth_in_km=depth, distance_in_degree=dist,
+                                                  phase_list=["P", "S", 'p', 's'])
                 iasp91_P_arrival.append(arrivals[0].time)
                 iasp91_S_arrival.append(arrivals[-1].time)
             except:
@@ -188,14 +193,15 @@ class recordProcess():
             Input : records = Dataframe records csv
             Output : the strike dip slip column series
         """
-        result = pd.merge(records, self.gcmt_catalog, on='event_id', how='inner')
-        return result["strike1"],result["dip1"],result["slip1"],result["strike2"],result["dip2"],result["slip2"]
+        result = pd.merge(records, self.gcmt_catalog,
+                          on='event_id', how='inner')
+        return result["strike1"], result["dip1"], result["slip1"], result["strike2"], result["dip2"], result["slip2"]
 
     def getFnmFrv(self, records):
         def Fnm(value):
             if value == "NULL":
                 return "NA"
-            elif value>-150 and value<-30:
+            elif value > -150 and value < -30:
                 return 1
             else:
                 return 0
@@ -203,31 +209,34 @@ class recordProcess():
         def Frv(value):
             if value == "NULL":
                 return "NA"
-            elif value>30 and value<150:
+            elif value > 30 and value < 150:
                 return 1
             else:
                 return 0
-        records['Fnm_1'] = records['dip1'].apply(lambda x:Fnm(x))
-        records['Frv_1'] = records['dip1'].apply(lambda x:Frv(x))
-        records['Fnm_2'] = records['dip2'].apply(lambda x:Fnm(x))
-        records['Frv_2'] = records['dip2'].apply(lambda x:Frv(x))
+        records['Fnm_1'] = records['dip1'].apply(lambda x: Fnm(x))
+        records['Frv_1'] = records['dip1'].apply(lambda x: Frv(x))
+        records['Fnm_2'] = records['dip2'].apply(lambda x: Fnm(x))
+        records['Frv_2'] = records['dip2'].apply(lambda x: Frv(x))
 
-        return records['Fnm_1'],records['Frv_1'],records['Fnm_2'],records['Frv_2']
+        return records['Fnm_1'], records['Frv_1'], records['Fnm_2'], records['Frv_2']
 
     def getMagnitudes(self, records):
-        result = pd.merge(records, self.gdms_catalog, on='event_id', how='inner')
-        return result["Mw"],result["ML"]
+        result = pd.merge(records, self.gdms_catalog,
+                          on='event_id', how='inner')
+        return result["Mw"], result["ML"]
 
     def getRecordDf(self, file_names):
         """
             To store the SAC file which matched with catalog
             Input : file_names = ['TW.C096.10.HLN.D.20220918145412.SAC',...]
         """
-        record = {'event_id': [], 'file_name': [], 'station':[], 'year':[], 'month':[], 'day':[], 'hour':[], 'minute':[], 'second':[]}
+        record = {'event_id': [], 'file_name': [], 'station': [], 'year': [
+        ], 'month': [], 'day': [], 'hour': [], 'minute': [], 'second': []}
         for file_name in file_names:
             for index, taiwan_time in enumerate(self.gdms_catalog['taiwan_time']):
                 if str(taiwan_time) in file_name:
-                    record['event_id'].append(self.gdms_catalog['event_id'][index])
+                    record['event_id'].append(
+                        self.gdms_catalog['event_id'][index])
                     record['file_name'].append(file_name)
                     record['station'].append(file_name.split('.')[1])
                     record['year'].append(file_name.split('.')[5][0:4])
@@ -246,11 +255,11 @@ class recordProcess():
 if __name__ == '__main__':
 
     #! catalogProcess
-    #? step-1 build catalog    
+    # ? step-1 build catalog
     gdms_catalog_path = "../TSMIP_Dataset/GDMS_catalog.csv"
     gdms_catalog = pd.read_csv(gdms_catalog_path)
     gdms_catalog_process = catalogProcess(gdms_catalog, gdms_catalog_path)
-    
+
     # new_datetime = []
     # for i in range(catalog.__len__()):
     #     new_datetime.append(
@@ -264,12 +273,12 @@ if __name__ == '__main__':
     instrument_path = f"../TSMIP_Dataset/InstrumentResponse/All"
     sac_process = SACProcess(sac_path, instrument_path)
 
-    #? step-2 remove instrument response
+    # ? step-2 remove instrument response
     # sac_files = sac_process.getSACFile(get_all=True)
     # instrument_file = sac_process.getInstrumentFile()
     # sac_process.removeInstrumentResponse(sac_files, instrument_file[0])
 
-    #? step-3 rename
+    # ? step-3 rename
     # file_names = [sac_process.reName(sac_path, os.path.basename(file)) for file in sac_files]
 
     #! recordProcess
@@ -277,7 +286,7 @@ if __name__ == '__main__':
     stations = pd.read_csv(stations_path)
     gcmt_catalog = pd.read_csv("../TSMIP_Dataset/merged_catalog.csv")
     record_process = recordProcess(gdms_catalog, gcmt_catalog, stations)
-    
+
     # #? step-4 build record csv
     # record_path = "../TSMIP_Dataset/GDMS_Record.csv"
     # sac_files = sac_process.getSACFile(get_all=False)
@@ -311,13 +320,12 @@ if __name__ == '__main__':
     # #? step-9 calculate Fnm Frv
     # Fnm_1, Frv_1, Fnm_2, Frv_2 = record_process.getFnmFrv(records)
     # records["Fnm_1"] = Fnm_1
-    # records["Frv_1"] = Frv_1   
+    # records["Frv_1"] = Frv_1
     # records["Fnm_2"] = Fnm_2
     # records["Frv_2"] = Frv_2
     # _ = record_process.buildRecordFile(records, record_path)
 
-    #? step-10 auto pick
+    # ? step-10 auto pick
     # records = pd.read_csv(record_path)
     # sac_files = sac_process.getSACFile(get_all=False)
     # sac_process.autoPick(records, sac_files)
-
