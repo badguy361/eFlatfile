@@ -18,8 +18,6 @@ source("SGM_Process/Function_Butterworth.r")
 source("SGM_Process/Function_write_DB.r")        
 source("SGM_Process/Function_write_File.r")    
 source("SGM_Process/Function_write_data.r")     
-#source("SGM_Process/Function_tcltk_mesgbox.r")  
-#source("SGM_Process/Function_Process.r")       
 
 ProcessTH_art <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5) {
   ## 
