@@ -32,6 +32,15 @@ class afterPickProcess():
         self.record.loc[self.record['save'] == 'y', 'filter_id'] = new_ids
         self.record.to_csv(self.record_path, index=False, na_rep='NA')
 
+    def addHPZ12(self):
+        """
+            To add HP_Z HP_1 HP_2 for RCTC
+        """
+        self.record['HP_Z'] = np.nan
+        self.record['HP_1'] = np.nan
+        self.record['HP_2'] = np.nan
+        self.record.to_csv(self.record_path, index=False, na_rep='NA')
+
     def removeNofilter(self):
         self.record.dropna().to_csv(self.record_path, index=False)
 
@@ -42,4 +51,6 @@ if __name__ == '__main__':
     merge = afterPickProcess(record_path, pick_result)
     # _ = merge.mergePick()
     # _ = merge.addFilterID()
-    _ = merge.removeNofilter()
+    _ = merge.addHPZ12()
+    # _ = merge.removeNofilter()
+

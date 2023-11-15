@@ -225,6 +225,10 @@ class recordProcess():
                           on='event_id', how='inner')
         return result["Mw"], result["ML"]
 
+    def getVs30(self, records):
+        result = pd.merge(records, self.stations, on="station", how="inner")
+        return result["Vs30"],result["Z1.0"]
+
     def getRecordDf(self, file_names):
         """
             To store the SAC file which matched with catalog
@@ -283,18 +287,18 @@ if __name__ == '__main__':
 
     #! recordProcess
     stations_path = "../TSMIP_Dataset/TSMIP_stations.csv"
+    record_path = "../TSMIP_Dataset/GDMS_Record.csv"
+    records = pd.read_csv(record_path)
     stations = pd.read_csv(stations_path)
     gcmt_catalog = pd.read_csv("../TSMIP_Dataset/merged_catalog.csv")
     record_process = recordProcess(gdms_catalog, gcmt_catalog, stations)
 
     # #? step-4 build record csv
-    # record_path = "../TSMIP_Dataset/GDMS_Record.csv"
     # sac_files = sac_process.getSACFile(get_all=False)
     # record = record_process.getRecordDf(sac_files)
     # _ = record_process.buildRecordFile(record, record_path)
 
     # #? step-5 merge Magnitudes
-    # records = pd.read_csv(record_path)
     # Mw, ML = record_process.getMagnitudes(records)
     # records["Mw"] = Mw
     # records["ML"] = ML
@@ -323,7 +327,12 @@ if __name__ == '__main__':
     # records["Frv_1"] = Frv_1
     # records["Fnm_2"] = Fnm_2
     # records["Frv_2"] = Frv_2
-    # _ = record_process.buildRecordFile(records, record_path)
+
+    # #? step-10 merge Vs30
+    vs30, z1_0 = record_process.getVs30(records)
+    records["Vs30"] = vs30
+    records["Z1.0"] = z1_0
+    _ = record_process.buildRecordFile(records, record_path)
 
     # ? step-10 auto pick
     # records = pd.read_csv(record_path)
