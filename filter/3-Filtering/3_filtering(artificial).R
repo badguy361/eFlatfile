@@ -12,11 +12,11 @@ source("SGM_Process/Function_Baseline.r")
 source("SGM_Process/Function_Butterworth.r")    
 source("SGM_Process/Function_ia_series.r")    
 
-ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5) {
+ProcessTH <- function(filter_ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5) {
   
   # nPole=2.5
 
-  data.info  <- filter.frame[filter.frame$filter_id==filter.ID,]
+  data.info  <- filter.frame[filter.frame$filter_id==filter_ID,]
   rpage <- as.character(paste0("../../TSMIP_Dataset/picking_result/09",str_pad(data.info$Month,2, pad = "0"),"/",paste0(data.info$file_name,".asc"))) 
   accs  <- read.table(rpage, skip=1, col.names=c("time","Z","H1","H2")) ###check skip = ?
   
@@ -39,7 +39,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
   HOUR <- data.info$hour
   MINUTE <- data.info$minute
   SEC <- data.info$second 
-  rec.id <- sprintf("%04d_%02d%02d_%02d%02d_%02d_%03s", 
+  rec_id <- sprintf("%04d_%02d%02d_%02d%02d_%02d_%03s", 
                           data.info$year, 
                           data.info$month, 
                           data.info$day, 
@@ -59,7 +59,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
   
   ML <- data.info$ML
   Mw <- data.info$Mw
-  filter.ID <- data.info$filter_id
+  filter_ID <- data.info$filter_id
   
   Pfile <- paste0(data.info$file_name,".asc")
   file_name <- data.info$file_name
@@ -174,7 +174,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     text(0,min(dis.bs)*0.5,paste(text.comp," component"), pos=4)
     legend("topleft",c("Before","After"),lty=1,col = c("black","red"),cex = 1.5)
     ################
-    path.1=paste(path2,"/",rec.id,".",filter.ID,".AVD_bc.",text.comp,".png",sep="" )
+    path.1=paste(path2,"/",rec_id,".",filter_ID,".AVD_bc.",text.comp,".png",sep="" )
     CairoPNG(filename = path.1, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
     # X11(width = 9, height = 9) 
     layout(matrix(1:4,4,1), heights=c(1.5,4,4,4))
@@ -284,7 +284,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     lines(freqs[-1], fs.amp[-1], col=2)
     abline(v=fc, col=6, lwd=2)
     
-    path.4=paste(path2,"/",rec.id,".",filter.ID,".FFT.",text.comp,".png",sep="")
+    path.4=paste(path2,"/",rec_id,".",filter_ID,".FFT.",text.comp,".png",sep="")
     CairoPNG(filename = path.4, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
     plot(c(0.01,100), range(fs.amp[-1]), log='xy', type='n',xlab='Frequency (Hz)', ylab='Fourier Amplitude')
     title(paste(EQ_ID,STA_ID,paste(text.comp,"Component"), sep=",   "),line = 2.2)
@@ -351,7 +351,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     text(0,max(dis.flt)*0.8,substr(paste("PGD=",max(abs(dis.flt))),1,12), pos=4)
     text(0,min(dis.flt)*0.8,paste(text.comp," component"), pos=4)
     legend("topleft",c("Before","After"),lty=1,col = c("black","red"),cex = 1.5)
-    path.2=paste(path2,"/",rec.id,".",filter.ID,".AVD_fl.",text.comp,".png",sep="")
+    path.2=paste(path2,"/",rec_id,".",filter_ID,".AVD_fl.",text.comp,".png",sep="")
     CairoPNG(filename = path.2, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
     layout(matrix(1:4,4,1), heights=c(1.5,4,4,4))
     par(mar = c(0,0,0,0))
@@ -408,7 +408,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     if (!is.na(uband[2])) abline(v=uband[2], lwd=2, col="grey90")
     
     ### psv
-    path.3=paste(path2,"/",rec.id,".",filter.ID,".rsp_psv.",text.comp,".png",sep="")
+    path.3=paste(path2,"/",rec_id,".",filter_ID,".rsp_psv.",text.comp,".png",sep="")
     CairoPNG(filename = path.3, width = 1280, height = 1024 ,pointsize = 24, bg = "white") # ,  res = 100
     plot_spectra(rsp, "psv")
     lines(rsp.flt$Period, rsp.flt$psv, type='l', lwd=2, col="red")
@@ -428,14 +428,14 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     legend("topright",c("Before","After"),lty=1,col = c("black","red"))
     
     ### psa
-    path.3=paste(path2,"/",rec.id,".",filter.ID,".rsp_psa.",text.comp,".png",sep="")
+    path.3=paste(path2,"/",rec_id,".",filter_ID,".rsp_psa.",text.comp,".png",sep="")
     CairoPNG(filename = path.3, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
     plot_spectra(rsp, "psa")
     lines(rsp.flt$Period, rsp.flt$psa, type='l', lwd=2, col="red")
     uband <- 1.0/fc/1.25
     mtext(paste("Bandpass Filtered Between ", signif(fc[1],4), '(Hz) and ', signif(fc[2],4), "(Hz)", sep=''), line=2)
     mtext(paste("Usable Period Range ", signif(uband[1],4), '(Sec) and ', signif(uband[2],4), "(Sec)", sep=''), line=1)
-    mtext(paste(rec.id,"  ID=",file_id," ",text.comp), line=3)
+    mtext(paste(rec_id,"  ID=",file_id," ",text.comp), line=3)
     legend("bottomleft", legend=text3,bg="transparent",cex=1,bty = "n",
            y.intersp=1.2)
     legend("topright",c("Before","After"),lty=1,col = c("black","red"))
@@ -449,7 +449,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     
     if(i ==1) rsp_V <- rsp.flt else if(i == 2) rsp_NS <-rsp.flt else rsp_EW <- rsp.flt
     
-    #Write_to_DB(filter.ID,rec.id,EQ_ID,EVN_ID,STA_ID,i,nPole,fc[1],fc[2],PGA,PGV,PGD,rsp$psa,author)
+    #Write_to_DB(filter_ID,rec_id,EQ_ID,EVN_ID,STA_ID,i,nPole,fc[1],fc[2],PGA,PGV,PGD,rsp$psa,author)
     acc.md5 <- digest(paste(acc.flt, collapse=","), serialize=FALSE) 
     #Write_to_DB(file_id,Pfile,file_name,i,nPole,fc[1],fc[2],PGA,PGV,PGD,rsp$psa,author,acc.md5)
     #Write_to_DB_sort(file_id,Pfile,file_name,i,nPole,fc[1],fc[2],PGA,PGV,PGD,author,acc.md5)
@@ -472,14 +472,14 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
       EW <- c(dt,acc.flt)
       write.table(EW,file=paste0("Tmp_save_file/EW.txt"),col.names = FALSE,row.names = FALSE)
     }
-    nametransfer(filedir1 = paste0("Tmp_save_file/NS.txt"), filedir2 =paste0("Tmp_save_file/EW.txt"), stationname = filter.ID , sn = rec.id,
+    nametransfer(filedir1 = paste0("Tmp_save_file/NS.txt"), filedir2 =paste0("Tmp_save_file/EW.txt"), stationname = filter_ID , sn = rec_id,
                  outputdir = 'Tmp_save_file/Inputdata')
     
   }  #end of loop 3 component
   
-  xx<- data.frame(filter.ID)
+  xx<- data.frame(filter_ID)
   
-  xx$rec.id<-rec.id
+  xx$rec_id<-rec_id
   #xx$EVN_ID<-EVN_ID
   xx$STA_ID<-STA_ID
   xx$dt<-dt
@@ -528,7 +528,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
   path9 <- paste("output_BSFL/TXT_output")
   ifelse(file.exists(path9),paste("file exit!"),dir.create(path9))
   
-  path10 <- paste(path9,"/",rec.id,"_",filter.ID,".txt",sep="")
+  path10 <- paste(path9,"/",rec.id,"_",filter_ID,".txt",sep="")
   write.table(xx, file= path10,sep=",",row.names = F)
   
   
@@ -549,7 +549,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
   period <- rsp_V$Period
   
   #  yy <- cbind(period,psv.ns,psv.ew,psv.v,psa.ns,psa.ew,psa.v,psa.sqrt)
-  #  write.table(yy, file=paste("D:/2019æ¿¾æ³¢_SSHAC/RSP/",filter.ID,"_RSP.txt",sep=""),sep = " ",row.names = F)  
+  #  write.table(yy, file=paste("D:/2019æ¿¾æ³¢_SSHAC/RSP/",filter_ID,"_RSP.txt",sep=""),sep = " ",row.names = F)  
   datat <- data.frame(t=period,h1=psd.ns,h2=psd.ew,h3=psd.v,h4=psv.ns,h5=psv.ew,h6=psv.v,h7=psa.ns,h8=psa.ew,h9=psa.v,h10=psa.sqrt)
   datat.fmt <- c(" PERIOD(SEC)     PSD-NS         PSD-EW         PSD-Z         PSV-NS         PSV-EW         PSV-Z         PSA-NS         PSA-EW         PSA-Z         PSA-sqrt",
                  sprintf("%10.3f%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E",datat$t,datat$h1,datat$h2,datat$h3,datat$h4,datat$h5,datat$h6,datat$h7,datat$h8,datat$h9,datat$h10))
@@ -558,7 +558,7 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
   write.table(datat.fmt,file=paste(path11,rec.id,"_RSP.txt",sep=""),row.names=FALSE,col.names=FALSE, quote=FALSE)
   
   ### geomean value response spectrum
-  path.12=paste(path2,"/",rec.id,".",filter.ID,".GM_rsp_shape.png",sep="")
+  path.12=paste(path2,"/",rec.id,".",filter_ID,".GM_rsp_shape.png",sep="")
   CairoPNG(filename = path.12, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
   y <- psa.sqrt
   yrange <- range(y)
@@ -626,23 +626,23 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
 filter.frame <- read.csv(file="../../TSMIP_Dataset/GDMS_Record.csv",sep=",",header = TRUE,stringsAsFactors = FALSE)
 # for (i in 1:14){
 #   if (i < 10){
-#     filter.ID= paste0("B00000",i)
-#     print(filter.ID)
-#     ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+#     filter_ID= paste0("B00000",i)
+#     print(filter_ID)
+#     ProcessTH_art(filter_ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
 #   }
 #   else if (i>=10 && i<100){
-#     filter.ID= paste0("B0000",i)
-#     print(filter.ID)
-#     ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+#     filter_ID= paste0("B0000",i)
+#     print(filter_ID)
+#     ProcessTH_art(filter_ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
 #   }
 #   else{
-#     filter.ID= paste0("B000",i)
-#     print(filter.ID)
-#     ProcessTH_art(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+#     filter_ID= paste0("B000",i)
+#     print(filter_ID)
+#     ProcessTH_art(filter_ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
 #   }
 # }
 
 
-filter.ID= "B00001"
-ProcessTH(filter.ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
+filter_ID= "B00001"
+ProcessTH(filter_ID, "yang", Baseline=TRUE, PreBaseline=FALSE, Skip=0, Add=20, Taper=0, nDC=2000, tb=5, te=5, nPole=2.5)
 
