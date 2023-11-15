@@ -214,7 +214,6 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     text(0,max(dis.bs)*0.5,substr(paste("PGD=",max(abs(dis.bs))),1,12), pos=4)
     legend("topleft",c("Before","After"),lty=1,col = c("black","red"),cex = 1.5)
     # text(0,min(dis.bs)*0.5,paste(text.comp," component"), pos=4)
-    graphics.off()
     
     ###########################
     #  qc <- setqc()
@@ -222,8 +221,9 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     #... PSV (pseudo spectral velocit; tripartite plot would be better)
     # rsp <- spectraw2(acc.bs, 0.05, 'psv') # spectraw2(acc.bs, damping, 'psv')
     psa <- PS_cal_cpp(acc.bs,periods,0.05,dt,type_return = 1)[2,]
-    psv <- PS_cal_cpp(acc.bs,periods,0.05,dt,type_return = 1)[3,] 
-    rsp <- data.frame(Period=periods,psa=psa,psv=psv)
+    psv <- PS_cal_cpp(acc.bs,periods,0.05,dt,type_return = 1)[3,]
+    sd <- PS_cal_cpp(acc.bs,periods,0.05,dt,type_return = 1)[4,]
+    rsp <- data.frame(Period=periods,psa=psa,psv=psv,sd=sd)
     
     
     # X11(width = 15, height = 9)
@@ -295,7 +295,6 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     lines(freqs[-1], fs.amp[-1], col="red")
     abline(v=fc, col="blue",lty=2, lwd=2)
     legend("topright",c("Before","After"),lty=1,col = c("black","red"),bg="white")
-    graphics.off()	
     
     #
     #... Prepare Fourier spectrum for inverse FFT
@@ -387,14 +386,15 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     text(0,max(dis.flt)*0.8,substr(paste("PGD=",max(abs(dis.flt))),1,12), pos=4)
     legend("topleft",c("Before","After"),lty=1,col = c("black","red"),cex = 1.5)
     # text(0,min(dis.flt)*0.8,paste(text.comp," component"), pos=4)
-    graphics.off()
     
     
     #... Compute and plot response spectra
     # rsp.flt <- spectraw2(acc.flt, 0.05, "psa")
     psa <- PS_cal_cpp(acc.flt,periods,0.05,dt,type_return = 1)[2,]
     psv <- PS_cal_cpp(acc.flt,periods,0.05,dt,type_return = 1)[3,] 
-    rsp.flt <- data.frame(Period=periods,psa=psa,psv=psv)
+    sd <- PS_cal_cpp(acc.bs,periods,0.05,dt,type_return = 1)[4,]
+    
+    rsp.flt <- data.frame(Period=periods,psa=psa,psv=psv,sd=sd)
     # rsp <- spectraw2(acc.bs, 0.05, "psa")
     X11(width = 6, height = 6)
     plot_spectra(rsp.flt, "psv")
@@ -426,7 +426,6 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     legend("bottomleft", legend=text3,bg="transparent",cex=1,bty = "n",
            y.intersp=1.2)
     legend("topright",c("Before","After"),lty=1,col = c("black","red"))
-    graphics.off()
     
     ### psa
     path.3=paste(path2,"/",rec.id,".",filter.ID,".rsp_psa.",text.comp,".png",sep="")
@@ -443,7 +442,6 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
     if (!is.na(uband[1])) abline(v=uband[1], lwd=2, col="blue",lty=2)
     if (!is.na(uband[2])) abline(v=uband[2], lwd=2, col="blue",lty=2)		
     abline(v=1/fc[1], lwd=2, col="blue",lty=2)
-    graphics.off()
     
     if(i ==1) PGA_V <-max(abs(acc.flt)) else if(i == 2) PGA_NS <-max(abs(acc.flt)) else PGA_EW <-max(abs(acc.flt))
     if(i ==1) PGV_V <-max(abs(vel.flt)) else if(i == 2) PGV_NS <-max(abs(vel.flt)) else PGV_EW <-max(abs(vel.flt))
@@ -530,62 +528,60 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
   path9 <- paste("output_BSFL/TXT_output")
   ifelse(file.exists(path9),paste("file exit!"),dir.create(path9))
   
-  path10 <- paste(path9,"/",rec.id,"_",filter.ID,".rdata",sep="")
-  save(xx, file= path10,row.names = F)
+  path10 <- paste(path9,"/",rec.id,"_",filter.ID,".txt",sep="")
+  write.table(xx, file= path10,sep=",",row.names = F)
   
-  graphics.off()
   
   ### output psv, psa data
-  # yy <- data.frame()
-  # 
-  # # copy from Function_Process_main_step2.R
-  # psd.v <- rsp_V$sd
-  # psd.ns <- rsp_NS$sd
-  # psd.ew <- rsp_EW$sd
-  # psa.v <- rsp_V$psa
-  # psa.ns <- rsp_NS$psa
-  # psa.ew <- rsp_EW$psa
-  # psv.v <- rsp_V$psv
-  # psv.ns <- rsp_NS$psv
-  # psv.ew <- rsp_EW$psv
-  # psa.sqrt <- sqrt(psa.ns*psa.ew)
-  # 
-  # period <- rsp_V$Period
-  # 
-  # #  yy <- cbind(period,psv.ns,psv.ew,psv.v,psa.ns,psa.ew,psa.v,psa.sqrt)
-  # #  write.table(yy, file=paste("D:/2019æ¿¾æ³¢_SSHAC/RSP/",filter.ID,"_RSP.txt",sep=""),sep = " ",row.names = F)  
-  # datat <- data.frame(t=period,h1=psd.ns,h2=psd.ew,h3=psd.v,h4=psv.ns,h5=psv.ew,h6=psv.v,h7=psa.ns,h8=psa.ew,h9=psa.v,h10=psa.sqrt)
-  # datat.fmt <- c(" PERIOD(SEC)     PSD-NS         PSD-EW         PSD-Z         PSV-NS         PSV-EW         PSV-Z         PSA-NS         PSA-EW         PSA-Z         PSA-sqrt",
-  #                sprintf("%10.3f%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E",datat$t,datat$h1,datat$h2,datat$h3,datat$h4,datat$h5,datat$h6,datat$h7,datat$h8,datat$h9,datat$h10))
-  # path11 <- paste("output_BSFL/RSP_output/",sep="")
-  # ifelse(file.exists(path11),paste("file exit!"),dir.create(path11))
-  # write.table(datat.fmt,file=paste(path11,rec.id,"_RSP.txt",sep=""),row.names=FALSE,col.names=FALSE, quote=FALSE)
+  yy <- data.frame()
   
-  # ### geomean value response spectrum
-  # path.12=paste(path2,"/",rec.id,".",filter.ID,".GM_rsp_shape.png",sep="")
-  # CairoPNG(filename = path.12, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
-  # y <- psa.sqrt
-  # yrange <- range(y)
-  # yrange[1] <- 10^(floor(log10(yrange[1])))
-  # yrange[2] <- 10^(ceiling(log10(yrange[2])))
-  # x <- period
-  # xrange <- range(x)
-  # plot(xrange, yrange, log='xy', type='n', ylab='SA (g)', xlab='Period (sec)')
-  # lines(x, y, lwd=2)
-  # xtck <- c(array(outer(1:9, c(0.01,0.1,1.0))),10)
-  # abline(v=xtck, col="grey90", lty=2)
-  # ytck <- log10(yrange)
-  # ytck <- 10^(seq(ytck[1], ytck[2]))
-  # abline(h=ytck, col="grey90", lty=2) 
-  # lines(period,psa.sqrt, type='l', lwd=5, col="orange")
-  # uband <- 1.0/fc/1.25
-  # mtext(paste(rec.id,"  ID=",file_id," response spectrum (geomean)"), line=3)
-  # mtext(paste("Bandpass Filtered Between ", signif(fc[1],4), '(Hz) and ', signif(fc[2],4), "(Hz)", sep=''), line=2)
-  # mtext(paste("Usable Period Range ", signif(uband[1],4), '(Sec) and ', signif(uband[2],4), "(Sec)", sep=''), line=1)
-  # legend("bottomleft", legend=text3,bg="transparent",cex=1,bty = "n",
-  #        y.intersp=1.2)
-  # abline(v=uband[1], lwd=2, col="blue", lty=2)
-  # graphics.off()
+  # copy from Function_Process_main_step2.R
+  psd.v <- rsp_V$sd
+  psd.ns <- rsp_NS$sd
+  psd.ew <- rsp_EW$sd
+  psa.v <- rsp_V$psa
+  psa.ns <- rsp_NS$psa
+  psa.ew <- rsp_EW$psa
+  psv.v <- rsp_V$psv
+  psv.ns <- rsp_NS$psv
+  psv.ew <- rsp_EW$psv
+  psa.sqrt <- sqrt(psa.ns*psa.ew)
+  period <- rsp_V$Period
+  
+  #  yy <- cbind(period,psv.ns,psv.ew,psv.v,psa.ns,psa.ew,psa.v,psa.sqrt)
+  #  write.table(yy, file=paste("D:/2019æ¿¾æ³¢_SSHAC/RSP/",filter.ID,"_RSP.txt",sep=""),sep = " ",row.names = F)  
+  datat <- data.frame(t=period,h1=psd.ns,h2=psd.ew,h3=psd.v,h4=psv.ns,h5=psv.ew,h6=psv.v,h7=psa.ns,h8=psa.ew,h9=psa.v,h10=psa.sqrt)
+  datat.fmt <- c(" PERIOD(SEC)     PSD-NS         PSD-EW         PSD-Z         PSV-NS         PSV-EW         PSV-Z         PSA-NS         PSA-EW         PSA-Z         PSA-sqrt",
+                 sprintf("%10.3f%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E%15.5E",datat$t,datat$h1,datat$h2,datat$h3,datat$h4,datat$h5,datat$h6,datat$h7,datat$h8,datat$h9,datat$h10))
+  path11 <- paste("output_BSFL/RSP_output/",sep="")
+  ifelse(file.exists(path11),paste("file exit!"),dir.create(path11))
+  write.table(datat.fmt,file=paste(path11,rec.id,"_RSP.txt",sep=""),row.names=FALSE,col.names=FALSE, quote=FALSE)
+  
+  ### geomean value response spectrum
+  path.12=paste(path2,"/",rec.id,".",filter.ID,".GM_rsp_shape.png",sep="")
+  CairoPNG(filename = path.12, width = 1280, height = 1024 ,pointsize = 24, bg = "white")
+  y <- psa.sqrt
+  yrange <- range(y)
+  yrange[1] <- 10^(floor(log10(yrange[1])))
+  yrange[2] <- 10^(ceiling(log10(yrange[2])))
+  x <- period
+  xrange <- range(x)
+  plot(xrange, yrange, log='xy', type='n', ylab='SA (g)', xlab='Period (sec)')
+  lines(x, y, lwd=2)
+  xtck <- c(array(outer(1:9, c(0.01,0.1,1.0))),10)
+  abline(v=xtck, col="grey90", lty=2)
+  ytck <- log10(yrange)
+  ytck <- 10^(seq(ytck[1], ytck[2]))
+  abline(h=ytck, col="grey90", lty=2) 
+  lines(period,psa.sqrt, type='l', lwd=5, col="orange")
+  uband <- 1.0/fc/1.25
+  mtext(paste(rec.id,"  ID=",file_id," response spectrum (geomean)"), line=3)
+  mtext(paste("Bandpass Filtered Between ", signif(fc[1],4), '(Hz) and ', signif(fc[2],4), "(Hz)", sep=''), line=2)
+  mtext(paste("Usable Period Range ", signif(uband[1],4), '(Sec) and ', signif(uband[2],4), "(Sec)", sep=''), line=1)
+  legend("bottomleft", legend=text3,bg="transparent",cex=1,bty = "n",
+         y.intersp=1.2)
+  abline(v=uband[1], lwd=2, col="blue", lty=2)
+  graphics.off()
   # 
   #### Output complete TS file
   # xx<- data.frame(rec.id)
@@ -607,18 +603,23 @@ ProcessTH <- function(filter.ID, author, Baseline=TRUE, PreBaseline=FALSE, Skip=
   write.table(zz, file= path10,sep = ",",row.names = F)
   
   ### for running RCTC 
-  # path13 <- paste("D:/2020 RCTC Result/Inputdata/")
-  # ifelse(file.exists(path13),paste("file exit!"),dir.create(path13))
-  # path14 <- paste("D:/2020 RCTC Result/Outputdata/")
-  # ifelse(file.exists(path14),paste("file exit!"),dir.create(path14))
-  # path15 <- paste("D:/2020 RCTC Result/Outputplot/")
-  # ifelse(file.exists(path15),paste("file exit!"),dir.create(path15))
-  #
-  # IMplot(inputpath = "D:/2020 RCTC Result_v2/Inputdata/", datatype = "timeseries",
-  #        tmax4penalty_in = 10, tmin4penalty_in = 0, combine_index = 50, ang1 = 0, damping = 0.05, fraction = 0.7, Interpolation_factor = "auto")
-  # 
-  # setwd("D:/Work/Database_20191101ver/03_filtering")
+  path13 <- paste("Tmp_save_file/Inputdata/")
+  ifelse(file.exists(path13),paste("file exit!"),dir.create(path13))
+  path14 <- paste("Tmp_save_file/Outputdata/")
+  ifelse(file.exists(path14),paste("file exit!"),dir.create(path14))
+  path15 <- paste("Tmp_save_file/Outputplot/")
+  ifelse(file.exists(path15),paste("file exit!"),dir.create(path15))
   
+  IMplot(inputpath = "Tmp_save_file/Inputdata/", datatype = "timeseries",
+         tmax4penalty_in = 10, tmin4penalty_in = 0, combine_index = 50, ang1 = 0, damping = 0.05, fraction = 0.7, Interpolation_factor = "auto")
+  
+  my.file.rename <- function(from, to) {
+    todir <- dirname(to)
+    if (!isTRUE(file.info(todir)$isdir)) dir.create(todir, recursive=TRUE)
+    file.copy(from = from,  to = to)
+  }
+  my.file.rename(from = "Tmp_save_file/Outputdata/summary.csv",
+              to = paste0("Tmp_save_file/Outputdata/summary_",rec.id,".csv"))
 }
 
 
