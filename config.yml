@@ -1,6 +1,7 @@
 # api_url for GDMS
 GDMS_api_url: https://gdms.cwa.gov.tw
 GCMT_api_url: https://www.globalcmt.org
+BATS_api_url: https://tecdc.earth.sinica.edu.tw
 download_path: E:\\Yu\\eFlatfile\\TSMIP_Dataset
 
 # log_level ERROR > WARNING > INFO > DEBUG
@@ -44,7 +45,8 @@ gcmt_catalog_range: {
     "upe2": "90",
     "list": "0"
 }
-eq_condition: {
+
+gdms_eq_condition: {
     "output": 'multi-mseed',
     "network": 'TSMIP',
     "station": 'all',
@@ -56,7 +58,7 @@ eq_condition: {
     "label": "Test_function_"
 }
 
-catalog_range: {
+gdms_catalog_range: {
     "stdate": '2014-01-01',
     "eddate": '2023-08-30',
     "stML": '0',
@@ -71,7 +73,7 @@ catalog_range: {
     "edlat": '26'
 }
 
-instrument_response: {
+gdms_instrument_response: {
   "output": "pz2",
   "network": "TSMIP",
   "station": "all",
@@ -80,4 +82,20 @@ instrument_response: {
   "stDatetime": "2020-12-01",
   "edDatetime": "2023-09-21",
   "label": "All"
+}
+
+bats_catalog_range: {
+  "InputOutType": "std",
+  "InputTB": "2014-01-01",
+  "InputTE": "2023-11-16",
+  "minlat": "21",
+  "maxlat": "23.5",
+  "minlon": "119",
+  "maxlon": "123",
+  "clat": "23.8",
+  "clon": "121.0",
+  "radius": "10",
+  "InputQval": "C3",
+  "MagType": "ml",
+  "Location": "all"
 }

@@ -56,7 +56,7 @@ class GDMS():
             Get special condition date waveform through api
         """
         get_waveform_url = f"{self.api_url}/php/sendEqdownload.php"
-        eq_condition = config.get("eq_condition")
+        eq_condition = config.get("gdms_eq_condition")
         try:
             response = self.rs.post(get_waveform_url, data=eq_condition)
             if response.json()["status"] == 1:
@@ -75,7 +75,7 @@ class GDMS():
             Get CWB catalog through api
         """
         get_catalog_url = f"{self.api_url}/php/dbconnect/getCatalog.php"
-        catalog_range = config.get("catalog_range")
+        catalog_range = config.get("gdms_catalog_range")
 
         try:
             eq_catalog = self.rs.post(get_catalog_url, data=catalog_range)
@@ -109,7 +109,7 @@ class GDMS():
             Get Instrument Response through api
         """
         get_catalog_url = f"{self.api_url}/php/sendRespDownload.php"
-        instrument_response = config.get("instrument_response")
+        instrument_response = config.get("gdms_instrument_response")
         try:
             results = self.rs.post(get_catalog_url,
                                    data=instrument_response)
