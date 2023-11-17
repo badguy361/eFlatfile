@@ -20,36 +20,66 @@ class BATS():
         """
         self.api_url = config.get("BATS_api_url")
         self.output_path = config.get("download_path")
+        self._login()
 
-    def getCatalog(self):
+    def _login(self):
         """
             Log in to the BATS API and set the authorization token in the request headers.
         """
-        get_catalog_url = f"{self.api_url}/FM/AutoBATS/cmtquery.php"
-        catalog_condition = config.get("bats_catalog_range")
-        get_catalog_data = {
-            "InputOutType": catalog_condition.get("InputOutType"),
-            "InputTB": catalog_condition.get("InputTB"),
-            "InputTE": catalog_condition.get("InputTE"),
-            "minlat": catalog_condition.get("minlat"),
-            "maxlat": catalog_condition.get("maxlat"),
-            "minlon": catalog_condition.get("minlon"),
-            "maxlon": catalog_condition.get("maxlon"),
-            "clat": catalog_condition.get("clat"),
-            "clon": catalog_condition.get("clon"),
-            "radius": catalog_condition.get("radius"),
-            "InputQval": catalog_condition.get("InputQval"),
-            "MagType": catalog_condition.get("MagType"),
-            "Location": catalog_condition.get("Location")
+        login_url = f"{self.api_url}/BATSWS/login.php"
+        login_data = {
+            "username": os.getenv("BATS_ACCOUNT"),
+            "password": os.getenv("BATS_PASSWORD"),
+            "submit": True
         }
+        try:
+            self.rs = requests.session()
+            response = self.rs.post(
+                login_url, data=login_data
+            )  # login logic: After login it will set up the session id in this machine, and it could login through this info
+            if response.status_code == 200:
+                logger.info("Logged in to BATS")
 
-        response = requests.post(
-            get_catalog_url, data=get_catalog_data
-        ) 
+            elif response.status_code != 200:
+                logger.error(response.status_code)
+                logger.error("Login failed, please check login information")
+        except:
+            logger.error("Login failed, please check base setting")
+
+    def getCatalog(self):
+        get_catalog_url = f"{self.api_url}/BATSWS/cmt.php"
+        response = self.rs.get(get_catalog_url)
         return response
+    # def getCatalog(self):
+    #     """
+    #         Log in to the BATS API and set the authorization token in the request headers.
+    #     """
+    #     get_catalog_url = f"{self.api_url}/FM/AutoBATS/cmtquery.php"
+    #     catalog_condition = config.get("bats_catalog_range")
+    #     get_catalog_data = {
+    #         "InputOutType": catalog_condition.get("InputOutType"),
+    #         "InputTB": catalog_condition.get("InputTB"),
+    #         "InputTE": catalog_condition.get("InputTE"),
+    #         "minlat": catalog_condition.get("minlat"),
+    #         "maxlat": catalog_condition.get("maxlat"),
+    #         "minlon": catalog_condition.get("minlon"),
+    #         "maxlon": catalog_condition.get("maxlon"),
+    #         "clat": catalog_condition.get("clat"),
+    #         "clon": catalog_condition.get("clon"),
+    #         "radius": catalog_condition.get("radius"),
+    #         "InputQval": catalog_condition.get("InputQval"),
+    #         "MagType": catalog_condition.get("MagType"),
+    #         "Location": catalog_condition.get("Location")
+    #     }
+
+    #     response = requests.post(
+    #         get_catalog_url, data=get_catalog_data
+    #     ) 
+    #     return response
 
 if __name__ == '__main__':
-    gcmt = BATS()
-    total_data = gcmt.getCatalog()
-    with open("test.txt","w") as f:
-        f.write(total_data.text)
+    # bats = BATS()
+    # result = bats.getCatalog()
+    get_catalog_url = f"https://tecws1.earth.sinica.edu.tw/BATSWS/cmt.php"
+    response = requests.get(get_catalog_url)
+    print(response.text)

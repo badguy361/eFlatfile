@@ -1,7 +1,7 @@
 # api_url for GDMS
 GDMS_api_url: https://gdms.cwa.gov.tw
 GCMT_api_url: https://www.globalcmt.org
-BATS_api_url: https://tecdc.earth.sinica.edu.tw
+BATS_api_url: https://tecws1.earth.sinica.edu.tw
 download_path: E:\\Yu\\eFlatfile\\TSMIP_Dataset
 
 # log_level ERROR > WARNING > INFO > DEBUG
