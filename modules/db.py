@@ -7,7 +7,7 @@ import datetime
 def merge_gdms_gcmt(start_date, end_date):
 
     criteria = f"""
-    UPSERT INTO merged_catalog (
+    INSERT INTO merged_catalog (
         event_id,
         date, 
         time,
@@ -45,20 +45,17 @@ def merge_gdms_gcmt(start_date, end_date):
             gdms_original.empirical_Mw,
             merged_results.gcmt_date,
             merged_results.gcmt_time,
-            merged_results.time_difference,
             merged_results.gcmt_lon,
             merged_results.gcmt_lat,
-            merged_results.distance_km_difference,
             merged_results.gcmt_depth,
             merged_results.gcmt_Mw,
-            merged_results.magnitude_difference,
             merged_results.gcmt_Ms,
-            merged_results.strike1,
-            merged_results.dip1,
-            merged_results.slip1,
-            merged_results.strike2,
-            merged_results.dip2,
-            merged_results.slip2
+            merged_results.gcmt_strike1,
+            merged_results.gcmt_dip1,
+            merged_results.gcmt_slip1,
+            merged_results.gcmt_strike2,
+            merged_results.gcmt_dip2,
+            merged_results.gcmt_slip2
         FROM
             gdms_catalog AS gdms_original
         LEFT JOIN
@@ -85,7 +82,7 @@ def merge_gdms_gcmt(start_date, end_date):
                         POINT(gdms.lon, gdms.lat),
                         POINT(gcmt.gcmt_lon, gcmt.gcmt_lat)
                     ) / 1000 AS distance_km_difference,
-                    ABS(gdms.Mw - gcmt.gcmt_Mw) AS magnitude_difference
+                    ABS(gdms.empirical_Mw - gcmt.gcmt_Mw) AS magnitude_difference
                 FROM
                     (
                         SELECT
@@ -126,9 +123,9 @@ def merge_gdms_gcmt(start_date, end_date):
                             POINT(gcmt.gcmt_lon, gcmt.gcmt_lat)
                         ) / 1000 < 35
                     AND (
-                        (gdms.Mw < 4 AND ABS(gdms.Mw - gcmt.gcmt_Mw) < 1.2)
+                        (gdms.empirical_Mw < 4 AND ABS(gdms.empirical_Mw - gcmt.gcmt_Mw) < 1.2)
                         OR
-                        (gdms.Mw >= 4 AND ABS(gdms.Mw - gcmt.gcmt_Mw) <= 0.9)
+                        (gdms.empirical_Mw >= 4 AND ABS(gdms.empirical_Mw - gcmt.gcmt_Mw) <= 0.9)
                     )
                     AND gdms.gdms_datetime BETWEEN '{start_date}' AND '{end_date}'
             ) AS merged_results
@@ -136,6 +133,11 @@ def merge_gdms_gcmt(start_date, end_date):
             gdms_original.event_id = merged_results.event_id;
     """
     return criteria
+
+def upload_bats_catalog():
+    query = """
+    INSERT INTO bats_catalog()
+    """
 if __name__ == "__main__":
 
     conn = pymysql.connect(host=os.getenv("DATABASE_URL"),
