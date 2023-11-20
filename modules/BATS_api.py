@@ -2,11 +2,10 @@ import requests
 from config import config
 from logger import logger
 import os
-from dotenv import load_dotenv
-import csv
-from bs4 import BeautifulSoup
+import pandas as pd
+import numpy as np
 import re
-from urllib.parse import urlsplit
+from datetime import datetime
 
 
 class BATS():
@@ -47,6 +46,11 @@ class BATS():
             logger.error("Login failed, please check base setting")
 
     def _getHashPassword(self):
+        """
+            To get hash password which show on the js funciton
+            Returns:
+                str: the password after hash
+        """
         get_password_url = f"{self.api_url}/BATSWS/cmt.php"
         response = self.rs.get(get_password_url)
         match = re.search(r"password=([a-zA-Z0-9]+)",response.text)
@@ -58,7 +62,12 @@ class BATS():
             logger.error("get password failed check if it's login")
         return password
     
-    def getCatalog(self,file_path = "../TSMIP_Dataset/"):
+    def getCatalog(self, file_path):
+        """
+            To get catalog from BATS api
+            Args:
+                file_path (str, optional): [description]. Defaults to "../TSMIP_Dataset/".
+        """
         password = self._getHashPassword()
         catalog_condition = config.get("bats_catalog_range")
         tb = catalog_condition.get("tb")
@@ -70,7 +79,7 @@ class BATS():
         label = catalog_condition.get("label")
         get_catalog_url = f"{self.api_url}/BATSWS/cmtquery?type=csv&tb={tb}&te={te}&maxmw={maxmw}&minmw={minmw}&maxdp={maxdp}&mindp={mindp}&l={label}&dl=1&lt=all&account={os.getenv('BATS_ACCOUNT')}&password={password}"
         response = self.rs.get(get_catalog_url)
-        with open(f"{file_path}{label}.csv", 'wb') as file:
+        with open(f"{file_path}", 'wb') as file:
             file.write(response.content)
 
     # def getCatalog(self):
@@ -100,6 +109,36 @@ class BATS():
     #     ) 
     #     return response
 
+class catalogProcess():
+
+    def __init__(self, gdms_catalog, gdms_catalog_path, bats_catalog, bats_catalog_path):
+        self.gdms_catalog_path = gdms_catalog_path
+        self.gdms_catalog = gdms_catalog
+        self.bats_catalog_path = bats_catalog_path
+        self.bats_catalog = bats_catalog
+
+    def removeKeysSpace(self):
+        self.bats_catalog.columns = self.bats_catalog.columns.str.strip()
+
+    def addEventId(self, bats_catalog_path):
+        gdms_catalog_subset = self.gdms_catalog[['depth', 'ML', 'date', 'event_id']]
+        result = pd.merge(self.bats_catalog, gdms_catalog_subset, left_on=['CWB Depth', 'ML', 'Date'], right_on=['depth', 'ML', 'date'], how='left')
+        result.drop('depth', axis=1, inplace=True)
+        result.drop('date', axis=1, inplace=True)
+        columns_reordered = [result.columns[-1]] + list(result.columns[:-1])
+        result = result[columns_reordered]
+        result.to_csv(f"{bats_catalog_path}",index=False)
+
 if __name__ == '__main__':
-    bats = BATS()
-    result = bats.getCatalog()
+    bats_catalog_path = "../TSMIP_Dataset/BATS_catalog.csv"
+    # bats = BATS()
+    # result = bats.getCatalog(bats_catalog_path)
+
+    gdms_catalog_path = "../TSMIP_Dataset/GDMS_catalog.csv"
+    gdms_catalog = pd.read_csv(gdms_catalog_path)
+    bats_catalog_path = "../TSMIP_Dataset/BATS_catalog.csv"
+    bats_catalog = pd.read_csv(bats_catalog_path)
+
+    bats_catalog_process = catalogProcess(gdms_catalog, gdms_catalog_path, bats_catalog, bats_catalog_path)
+    _ = bats_catalog_process.removeKeysSpace()
+    _ = bats_catalog_process.addEventId(bats_catalog_path)

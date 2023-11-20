@@ -91,5 +91,5 @@ bats_catalog_range: {
   "maxmw" : "10",
   "mindp" : "0",
   "maxdp" : "10000",
-  "label": "test"
+  "label": "BATS_catalog"
 }
