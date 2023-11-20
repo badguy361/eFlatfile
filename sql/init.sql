@@ -11,7 +11,7 @@ CREATE TABLE gdms_catalog (
     lon Float,
     depth Float,
     ML Float,
-    Mw Float,
+    empirical_Mw Float,
     nstn INT,
     dmin Float,
     gap INT,
