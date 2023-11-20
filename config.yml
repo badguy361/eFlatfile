@@ -85,17 +85,11 @@ gdms_instrument_response: {
 }
 
 bats_catalog_range: {
-  "InputOutType": "std",
-  "InputTB": "2014-01-01",
-  "InputTE": "2023-11-16",
-  "minlat": "21",
-  "maxlat": "23.5",
-  "minlon": "119",
-  "maxlon": "123",
-  "clat": "23.8",
-  "clon": "121.0",
-  "radius": "10",
-  "InputQval": "C3",
-  "MagType": "ml",
-  "Location": "all"
+  "tb": "2014-01-01T00:00:00",
+  "te": "2023-11-16T23:59:59",
+  "minmw" : "0",
+  "maxmw" : "10",
+  "mindp" : "0",
+  "maxdp" : "10000",
+  "label": "test"
 }

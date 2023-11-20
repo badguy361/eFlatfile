@@ -28,7 +28,7 @@ class BATS():
         """
         login_url = f"{self.api_url}/BATSWS/login.php"
         login_data = {
-            "username": os.getenv("BATS_ACCOUNT"),
+            "account": os.getenv("BATS_ACCOUNT"),
             "password": os.getenv("BATS_PASSWORD"),
             "submit": True
         }
@@ -46,10 +46,33 @@ class BATS():
         except:
             logger.error("Login failed, please check base setting")
 
-    def getCatalog(self):
-        get_catalog_url = f"{self.api_url}/BATSWS/cmt.php"
+    def _getHashPassword(self):
+        get_password_url = f"{self.api_url}/BATSWS/cmt.php"
+        response = self.rs.get(get_password_url)
+        match = re.search(r"password=([a-zA-Z0-9]+)",response.text)
+        password = 0
+        if match:
+            password = match.group(1)
+            logger.info("get password successfully")
+        else:
+            logger.error("get password failed check if it's login")
+        return password
+    
+    def getCatalog(self,file_path = "../TSMIP_Dataset/"):
+        password = self._getHashPassword()
+        catalog_condition = config.get("bats_catalog_range")
+        tb = catalog_condition.get("tb")
+        te = catalog_condition.get("te")
+        maxmw = catalog_condition.get("maxmw")
+        minmw = catalog_condition.get("minmw")
+        maxdp = catalog_condition.get("maxdp")
+        mindp = catalog_condition.get("mindp")
+        label = catalog_condition.get("label")
+        get_catalog_url = f"{self.api_url}/BATSWS/cmtquery?type=csv&tb={tb}&te={te}&maxmw={maxmw}&minmw={minmw}&maxdp={maxdp}&mindp={mindp}&l={label}&dl=1&lt=all&account={os.getenv('BATS_ACCOUNT')}&password={password}"
         response = self.rs.get(get_catalog_url)
-        return response
+        with open(f"{file_path}{label}.csv", 'wb') as file:
+            file.write(response.content)
+
     # def getCatalog(self):
     #     """
     #         Log in to the BATS API and set the authorization token in the request headers.
@@ -78,8 +101,5 @@ class BATS():
     #     return response
 
 if __name__ == '__main__':
-    # bats = BATS()
-    # result = bats.getCatalog()
-    get_catalog_url = f"https://tecws1.earth.sinica.edu.tw/BATSWS/cmt.php"
-    response = requests.get(get_catalog_url)
-    print(response.text)
+    bats = BATS()
+    result = bats.getCatalog()
