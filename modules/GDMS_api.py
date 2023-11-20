@@ -7,6 +7,9 @@ import csv
 from bs4 import BeautifulSoup
 import re
 from urllib.parse import urlsplit
+import numpy as np
+from datetime import datetime, timedelta
+import pandas as pd
 
 load_dotenv()
 
@@ -167,6 +170,47 @@ class GDMS():
                 file.write(response.content)
 
 
+class catalogProcess():
+
+    def __init__(self, catalog, catalog_path):
+        self.catalog_path = catalog_path
+        self.catalog = catalog
+
+    def GMTtoTaiwanTime(self, date, time):
+        """
+            To change CWB catalog GMT+0 time to GMT+8 Taiwan time
+            Input: date = 2018/1/1, time = 01:46:04
+            Output: 20180101094604
+        """
+        date_string = date + 'T' + time
+        date_format = "%Y/%m/%dT%H:%M:%S"
+        formatted_datetime = datetime.strptime(date_string, date_format)
+        time_difference = timedelta(hours=8)
+        new_datetime = formatted_datetime + time_difference
+        new_datetime = new_datetime.strftime('%Y%m%d%H%M%S')
+        return new_datetime
+
+    def addTaiwanTime(self, new_datetime):
+        """
+            Add GMT+8 Taiwan time to catalog
+        """
+        self.catalog["taiwan_time"] = new_datetime
+        self.catalog.to_csv(self.catalog_path, index=False)
+
+    def addMw(self):
+        """
+            Add Mw to catalog which calculate by formula
+            ML≤6.0  ->  ML = 0.961Mw+0.338±0.256
+            ML≥5.5  ->  ML = 5.115 ln(Mw)-3.131±0.379
+            鄭世楠等(2010)所建立之芮氏規模與震矩規模轉換關係式進行轉換
+        """
+        self.catalog["Mw"] = np.where(
+            self.catalog["ML"] > 6.0,
+            np.exp((self.catalog["ML"] + 3.131) / 5.115),
+            (self.catalog["ML"] - 0.338) / 0.961)
+        self.catalog["Mw"] = round(self.catalog["Mw"], 2)
+        self.catalog.to_csv(self.catalog_path, index=False)
+
 if __name__ == '__main__':
     gdms = GDMS()
     eq_catalog = gdms.getCatalog()
@@ -180,3 +224,18 @@ if __name__ == '__main__':
     # date = '2023-10-14'
     # total_url = gdms.getDownUrl(result, date)
     # _ = gdms.autoDownloadData(total_url, file_path)
+
+    
+    #! catalogProcess
+    # ? step-1 build catalog
+    gdms_catalog_path = "../TSMIP_Dataset/GDMS_catalog.csv"
+    gdms_catalog = pd.read_csv(gdms_catalog_path)
+    gdms_catalog_process = catalogProcess(gdms_catalog, gdms_catalog_path)
+
+    # new_datetime = []
+    # for i in range(catalog.__len__()):
+    #     new_datetime.append(
+    #         gdms_catalog_process.GMTtoTaiwanTime(catalog['date'][i],
+    #                                         catalog['time'][i]))
+    # _ = gdms_catalog_process.addTaiwanTime(new_datetime)
+    # _ = gdms_catalog_process.addMw()
