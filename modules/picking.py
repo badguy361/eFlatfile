@@ -24,7 +24,8 @@ class picking():
             Read all SAC file downloaded from TSMIP
             Output: ['TW.A002.10.HLE.D.20220918144415.SAC', 'TW.A003.10.HLE.D.20220918144415.SAC',...]
         """
-        total_files = glob.glob(f"{self.sac_path}/*HLE*{year}{mon}*.SAC")
+        # total_files = glob.glob(f"{self.sac_path}/*HLE*{year}{mon}*.SAC")
+        total_files = glob.glob(f"{self.sac_path}/*E*.SAC")
         file_names = [os.path.basename(_) for _ in total_files]
         return file_names
     
@@ -45,7 +46,7 @@ class picking():
         Mw = results[results['file_name'] == sac_HLE]["Mw"].values[0]
         return Mw
 
-    def inputResult(self, sac_file_name, sac1, sac2, sacZ):
+    def inputResult(self, num, sac_file_name, sac1, sac2, sacZ):
         """
             To determine the output by Y or Z or 1-5
             Input: sac_file_name= "TW.A002.10.HLE.D.20220918144415.SAC"
@@ -56,7 +57,8 @@ class picking():
         check = input()
         if check == "Y" or check == "y":
             logger.info(f"Result : {check}")
-            self.result[num] = [sac_file_name, "y", round(sac1.t4,2), round(sac1.t1) , round(sac1.t2), round(sac1.t3)]
+            self.result[num] = [sac_file_name, "y", round(-sac1.b,2), round(-sac1.b,2)+round(sac1.t1) , round(-sac1.b,2)+round(sac1.t2), max(round(sac1.depmax,2),round(sac2.depmax,2),round(sacZ.depmax,2))]
+            # self.result[num] = [sac_file_name, "y", round(sac1.t4,2), round(sac1.t1) , round(sac1.t2), round(sac1.t3)]
             self.zory = "y"
         elif check == "Z" or check == "z":
             logger.info(f"Result : {check}")
@@ -129,16 +131,19 @@ class picking():
                 # print(type(sac1.data[1]))
                 # print(sac1.reftime)
 
-                self.inputResult(sac_file_name, sac1, sac2, sacZ)
-                if self.zory != '':
+                self.zory = ''
+                self.inputResult(index, sac_file_name, sac1, sac2, sacZ)
+                # if self.zory != '':
+                if self.zory == 'y':
                     self.sacToAsc(sac_file_name, sac1, sac2, sacZ, self.zory)
-                logger.info(self.result)
+                logger.info(self.result[index])
 
         finally:
             file_exists = os.path.exists(f"{self.asc_path}/result.csv")
             result = pd.DataFrame.from_dict(self.result,orient='index')
             if not file_exists:
-                columns = ["file_name","pick_result","start_time","p_arrival","s_arrival","end_time"]
+                # columns = ["file_name","pick_result","start_time","p_arrival","s_arrival","end_time"]
+                columns = ["file_name","pick_result","start_time","p_arrival","s_arrival","pga"]
                 result.to_csv(f"{self.asc_path}/result.csv",header=columns,index=True,mode='a')
                 logger.info("finish add result.csv.")
             else:

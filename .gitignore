@@ -12,6 +12,10 @@ InstrumentResponse
 *.pdf
 *H1
 *H2
+*.tar
+*.zip
+*.TW
+*.rar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

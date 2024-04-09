@@ -11,7 +11,9 @@ from logger import logger
 
 
 class SACProcess():
-
+    """
+        To process the SAC file from GDMS
+    """
     def __init__(self, sac_path, instrument_path):
         os.putenv("SAC_DISPLAY_COPYRIGHT", "0")
         self.sac_path = sac_path
@@ -101,7 +103,9 @@ class SACProcess():
         logger.info("auto pick finished.")
 
 class recordProcess():
-
+    """
+        To get the entire record csv from SAC file which be processd by SACProcess module
+    """
     def __init__(self, gdms_catalog, gcmt_catalog, stations):
         self.gdms_catalog = gdms_catalog
         self.stations = stations
